@@ -5,7 +5,7 @@
 namespace Dunsparce {
     class Bitboard {
         public:
-            Bitboard(U64 board = 0): board{board} {}
+            Bitboard(U64 board = 0ULL): board{board} {}
 
             Bitboard operator~ () const { return ~board; }
 
@@ -36,7 +36,7 @@ namespace Dunsparce {
             bool operator==(U64 rhs) { return board == rhs; }
             bool operator==(const Bitboard& other) { return board == other.board; }
 
-            bool isSetAt(int n) {
+            bool isSet(int n) {
                 return (board >> n) & 1;
             }
             
@@ -49,6 +49,7 @@ namespace Dunsparce {
                 i *= 0x01010101;
                 return  i >> 24;
             }
+
         private:
             uint64_t board;
     };
