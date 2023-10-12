@@ -2,5 +2,4 @@
 #include "Dunsparce/view/view.hpp"
 
 int main() {
-    View::printBoard();
 }
