@@ -24,9 +24,8 @@ class Board {
         void init();
         void initFromFen(std::string_view fen);
         int evalPieceMaterial();
-        bool otherColor(Color color);
+        Color oppColor(Color color);
         char pieceToChar(Piece piece);
-        std::string_view pieceToUnicode(Piece piece);
 
     private:
         void initState(const BoardState& state);

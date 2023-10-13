@@ -26,11 +26,13 @@ void Board::init() {
 void Board::initFromFen(std::string_view fen) {
 
     initState({
-        //.squares = ,
-        //.nextMove = ,
-        //.fiftyMoves = ,
-        //.castlingRightsWhite = {},
-        //.castlingRightsBlack = {}
+        // .squares = state.squares,
+        // .nextMove = Color::White,
+        // .fiftyMoves = 0,
+        // .castlingRightsWhiteShort = true,
+        // .castlingRightsWhiteLong = true,
+        // .castlingRightsBlackShort = true,
+        // .castlingRightsBlackLong = true,
     });
 };
 
@@ -82,7 +84,7 @@ void Board::initState(const BoardState& state) {
     this->state.fiftyMoves = state.fiftyMoves;
 
     evalPieceMaterial();
-    printUnicodeBoard(state.squares);
+    DEBUG::printUnicodeBoard(state.squares);
 }
 
 int Board::evalPieceMaterial() {
@@ -121,30 +123,8 @@ char Board::pieceToChar(Piece piece) {
     }
 }
 
-std::string_view Board::pieceToUnicode(Piece piece) {
-    using enum Piece;
-    switch(piece) {
-        case BlackPawn:   return "♟︎"; break;
-        case BlackKnight: return "♞"; break;
-        case BlackBishop: return "♝"; break;
-        case BlackRook:   return "♜"; break;
-        case BlackQueen:  return "♛"; break;
-        case BlackKing:   return "♚"; break;
-
-        case WhitePawn:   return "♙"; break;
-        case WhiteKnight: return "♘"; break;
-        case WhiteBishop: return "♗"; break;
-        case WhiteRook:   return "♔"; break;
-        case WhiteQueen:  return "♕"; break;
-        case WhiteKing:   return "♚"; break;
-
-        case None:        return " "; break;
-        default: throw "should never throw";
-    }
-}
-
-bool Board::otherColor(Color color) {
-    return !static_cast<int>(color);
+Color Board::oppColor(Color color) {
+    return static_cast<Color>(!static_cast<int>(color));
 }
 
 // 
