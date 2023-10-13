@@ -15,6 +15,8 @@ constexpr int ROOK_VALUE   = 500;
 constexpr int QUEEN_VALUE  = 900;
 constexpr int KING_VALUE   = 9999;
 
+constexpr std::string_view STARTING_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";
+
 constexpr std::array<std::string_view, 64> SQUARE_NAMES = {
     "a1","b1","c1","d1","e1","f1","g1","h1",
     "a2","b2","c2","d2","e2","f2","g2","h2",
@@ -26,17 +28,6 @@ constexpr std::array<std::string_view, 64> SQUARE_NAMES = {
     "a8","b8","c8","d8","e8","f8","g8","h8"
 };
 
-// am lazy
-constexpr std::array<int, 64> STARTING_POSITION = {
-    3, 1, 2, 5, 4, 2, 1, 3,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    12, 12, 12, 12, 12, 12, 12, 12,
-    12, 12, 12, 12, 12, 12, 12, 12,
-    12, 12, 12, 12, 12, 12, 12, 12,
-    12, 12, 12, 12, 12, 12, 12, 12,
-    6, 6, 6, 6, 6, 6, 6, 6,
-    9, 7, 8, 10, 11, 8, 7, 9
-};
 
 // https://github.com/official-stockfish/Stockfish/blob/master/src/bitboard.h
 constexpr Bitboard FileA = 0x0101010101010101ULL;

@@ -13,19 +13,20 @@ class Board {
         struct BoardState {
             std::array<Piece, 64> squares;
             Color nextMove;
-            int fiftyMoves;
             bool castlingRightsWhiteShort;
             bool castlingRightsWhiteLong;
             bool castlingRightsBlackShort;
             bool castlingRightsBlackLong;
             int croissant;
+            int halfMoves;
+            int fullMoves;
         };
 
-        void init();
-        void initFromFen(std::string_view fen);
+        void init(std::string_view fen);
+        BoardState parseFen(std::string_view fen);
         int evalPieceMaterial();
         Color oppColor(Color color);
-        char pieceToChar(Piece piece);
+        Piece charToPiece(char c);
 
     private:
         void initState(const BoardState& state);

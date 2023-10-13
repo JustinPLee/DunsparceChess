@@ -10,5 +10,6 @@
 - UCI doc
 - stockfish github
 - TSPC
+- https://www.chess.com/terms/fen-chess
 
 ## Thoughts
