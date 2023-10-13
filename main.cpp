@@ -1,5 +1,7 @@
 #include <iostream>
-#include "Dunsparce/view/view.hpp"
+#include "src/board.hpp"
 
 int main() {
+    Board board;
+    return 0;
 }
