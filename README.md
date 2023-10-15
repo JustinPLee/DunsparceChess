@@ -11,5 +11,6 @@
 - stockfish github
 - TSPC
 - https://www.chess.com/terms/fen-chess
+- https://www.binaryhexconverter.com/hex-to-binary-converter 
 
 ## Thoughts

@@ -9,46 +9,33 @@
 
 class Board {
     public:
-        Board();
+        Board(std::string_view fen = STARTING_FEN);
         struct BoardState {
-            std::array<Piece, 64> squares;
-            Color nextMove;
-            bool castlingRightsWhiteShort;
-            bool castlingRightsWhiteLong;
-            bool castlingRightsBlackShort;
-            bool castlingRightsBlackLong;
-            int croissant;
+            int castlingRights;
+            Square croissant;
             int halfMoves;
-            int fullMoves;
+            uint64_t zobrist_key; // !!! ooowow
         };
 
         void init(std::string_view fen);
-        BoardState parseFen(std::string_view fen);
+        void processFen(std::string_view fen);
+        std::string exportFen();
         int evalPieceMaterial();
-        Color oppColor(Color color);
-        Piece charToPiece(char c);
+        void reversePov();
+        void print();
+        void clear();
 
     private:
-        void initState(const BoardState& state);
+        void initBitboards();
+        // bitboards
+        std::array<std::array<Bitboard, N_COLORS>, N_PIECES> pieces_;
+        std::array<Bitboard, N_COLORS> colors_;
+        // pieces indexed 0 through 63 for fast access
+        std::array<Piece, 64> squares_;
+        // current state variables
+        BoardState state_;
+        Color nextMove_ = WHITE;
+        int fullMoves_ = 0;
 
-        Bitboard whitePawnsBB;
-        Bitboard whiteKnightsBB;
-        Bitboard whiteBishopsBB;
-        Bitboard whiteRooksBB;
-        Bitboard whiteQueensBB;
-        Bitboard whiteKingBB;
-        
-        Bitboard blackPawnsBB;
-        Bitboard blackKnightsBB;
-        Bitboard blackBishopsBB;
-        Bitboard blackRooksBB;
-        Bitboard blackQueensBB;
-        Bitboard blackKingBB;
-
-        Bitboard whitePiecesBB;
-        Bitboard blackPiecesBB;
-        Bitboard occupiedBB;
-
-        int pieceMaterial;
-        BoardState state;
+        bool pov_ = WHITE;
 };

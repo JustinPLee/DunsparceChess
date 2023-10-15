@@ -9,11 +9,11 @@ constexpr bool WHITE_MOVE = 0;
 constexpr bool BLACK_MOVE = 1;
 
 constexpr int PAWN_VALUE   = 100;
-constexpr int KNIGHT_VALUE = 300;
-constexpr int BISHOP_VALUE = 300;
+constexpr int KNIGHT_VALUE = 320;
+constexpr int BISHOP_VALUE = 330;
 constexpr int ROOK_VALUE   = 500;
 constexpr int QUEEN_VALUE  = 900;
-constexpr int KING_VALUE   = 9999;
+constexpr int KING_VALUE   = 10000;
 
 constexpr std::string_view STARTING_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";
 
@@ -30,23 +30,20 @@ constexpr std::array<std::string_view, 64> SQUARE_NAMES = {
 
 
 // https://github.com/official-stockfish/Stockfish/blob/master/src/bitboard.h
-constexpr Bitboard FileA = 0x0101010101010101ULL;
-constexpr Bitboard FileB = FileA << 1;
-constexpr Bitboard FileC = FileA << 2;
-constexpr Bitboard FileD = FileA << 3;
-constexpr Bitboard FileE = FileA << 4;
-constexpr Bitboard FileF = FileA << 5;
-constexpr Bitboard FileG = FileA << 6;
-constexpr Bitboard FileH = FileA << 7;
+const Bitboard FILEA_BB = 0x0101010101010101ULL;
+const Bitboard FILEB_BB = FILEA_BB << 1;
+const Bitboard FILEC_BB = FILEA_BB << 2;
+const Bitboard FILED_BB = FILEA_BB << 3;
+const Bitboard FILEE_BB = FILEA_BB << 4;
+const Bitboard FILEF_BB = FILEA_BB << 5;
+const Bitboard FILEG_BB = FILEA_BB << 6;
+const Bitboard FILEH_BB = FILEA_BB << 7;
 
-constexpr Bitboard Rank1 = 0xFF;
-constexpr Bitboard Rank2 = Rank1 << (8 * 1);
-constexpr Bitboard Rank3 = Rank1 << (8 * 2);
-constexpr Bitboard Rank4 = Rank1 << (8 * 3);
-constexpr Bitboard Rank5 = Rank1 << (8 * 4);
-constexpr Bitboard Rank6 = Rank1 << (8 * 5);
-constexpr Bitboard Rank7 = Rank1 << (8 * 6);
-constexpr Bitboard Rank8 = Rank1 << (8 * 7);
-
-constexpr std::array<Bitboard, 8> Files = { FileA, FileB, FileC, FileD, FileE, FileF, FileG, FileH };
-constexpr std::array<Bitboard, 8> Ranks = { Rank1, Rank2, Rank3, Rank4, Rank5, Rank6, Rank7, Rank8 };
+const Bitboard RANK1_BB = 0xFF;
+const Bitboard RANK2_BB = RANK1_BB << (8 * 1);
+const Bitboard RANK3_BB = RANK1_BB << (8 * 2);
+const Bitboard RANK4_BB = RANK1_BB << (8 * 3);
+const Bitboard RANK5_BB = RANK1_BB << (8 * 4);
+const Bitboard RANK6_BB = RANK1_BB << (8 * 5);
+const Bitboard RANK7_BB = RANK1_BB << (8 * 6);
+const Bitboard RANK8_BB = RANK1_BB << (8 * 7);

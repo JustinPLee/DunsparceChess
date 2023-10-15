@@ -1,181 +1,204 @@
-#include <sstream>
+#include <iostream>
 #include "types.hpp"
 #include "constants.hpp"
-#include "print.hpp"
 #include "board.hpp"
+#include "utils.hpp"
 
-Board::Board() {
-    init(STARTING_FEN);
+Board::Board(std::string_view fen) {
+    init(fen);
 }
 
 void Board::init(std::string_view fen) {
-    for(int i = 0; i < 64; i++) {
-        state.squares[i] = Piece::None;
-    }
-    BoardState state = parseFen(fen);
-    this->state = state;
-
-    // initializing bitboards
-    whitePawnsBB    = 0ULL;
-    whiteKnightsBB  = 0ULL;
-    whiteBishopsBB  = 0ULL;
-    whiteRooksBB    = 0ULL;
-    whiteQueensBB   = 0ULL;
-    whiteKingBB     = 0ULL;
-       
-    blackPawnsBB    = 0ULL;
-    blackKnightsBB  = 0ULL;
-    blackBishopsBB  = 0ULL;
-    blackRooksBB    = 0ULL;
-    blackQueensBB   = 0ULL;
-    blackKingBB     = 0ULL;
-
-    whitePiecesBB   = 0ULL;
-    blackPiecesBB   = 0ULL;
-    occupiedBB      = 0ULL;
-
-    using enum Piece;
-    for(int i = 0; i < 64; i++) {
-        if(state.squares[i] == WhitePawn)   {   whitePawnsBB   |= (1ULL << i); continue; }
-        if(state.squares[i] == BlackPawn)   {   blackPawnsBB   |= (1ULL << i); continue; }
-        if(state.squares[i] == WhiteKnight) {   whiteKnightsBB |= (1ULL << i); continue; }
-        if(state.squares[i] == BlackKnight) {   blackKnightsBB |= (1ULL << i); continue; }
-        if(state.squares[i] == WhiteBishop) {   whiteBishopsBB |= (1ULL << i); continue; }
-        if(state.squares[i] == BlackBishop) {   blackBishopsBB |= (1ULL << i); continue; }
-        if(state.squares[i] == WhiteRook)   {   whiteRooksBB   |= (1ULL << i); continue; }
-        if(state.squares[i] == BlackRook)   {   blackRooksBB   |= (1ULL << i); continue; }
-        if(state.squares[i] == WhiteQueen)  {   whiteQueensBB  |= (1ULL << i); continue; }
-        if(state.squares[i] == BlackQueen)  {   blackQueensBB  |= (1ULL << i); continue; }
-        if(state.squares[i] == WhiteKing)   {   whiteKingBB    |= (1ULL << i); continue; }
-        if(state.squares[i] == BlackKing)   {   blackKingBB    |= (1ULL << i); continue; }
-    }
-
-    whitePiecesBB = whitePawnsBB | whiteKnightsBB | whiteBishopsBB | whiteRooksBB | whiteQueensBB | whiteKingBB;
-    blackPiecesBB = blackPawnsBB | blackKnightsBB | blackBishopsBB | blackRooksBB | blackQueensBB | blackKingBB;
-
-
-    evalPieceMaterial();
-    DEBUG::printUnicodeBoard(state.squares);
+    clear();
+    processFen(fen);
 };
 
-int Board::evalPieceMaterial() {
-    this->pieceMaterial =  whitePawnsBB.popcount()   * PAWN_VALUE   +
-                           whiteKnightsBB.popcount() * KNIGHT_VALUE +
-                           whiteBishopsBB.popcount() * BISHOP_VALUE +
-                           whiteRooksBB.popcount()   * ROOK_VALUE   +
-                           whiteQueensBB.popcount()  * QUEEN_VALUE;
-    this->pieceMaterial -= blackPawnsBB.popcount()   * PAWN_VALUE   +
-                           blackKnightsBB.popcount() * KNIGHT_VALUE +
-                           blackBishopsBB.popcount() * BISHOP_VALUE +
-                           blackRooksBB.popcount()   * ROOK_VALUE   +
-                           blackQueensBB.popcount()  * QUEEN_VALUE;
-    return this->pieceMaterial;
+void Board::clear() {
+    for(int color = 0; color < N_COLORS; color++) {
+        for(int ptype = 0; ptype < N_PIECES; ptype++) {
+            pieces_[color][ptype] = 0ULL;
+        }
+    }
+    for(int square = 0; square < N_SQUARES; square++) {
+        squares_[square] = { NONE, NULL_COLOR };
+    }
+
+    colors_[WHITE] = 0ULL;
+    colors_[BLACK] = 0ULL;
+
+    state_ = {
+        .castlingRights = 15,
+        .croissant = NULL_SQUARE,
+        .halfMoves = 0,
+        .zobrist_key = 0ULL
+    };
+    fullMoves_ = 0;
+    nextMove_ = WHITE;
+    pov_ = WHITE;
+
 }
 
-Board::BoardState Board::parseFen(std::string_view fen) {
+void Board::processFen(std::string_view fen) {
     // rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0
     // lowercase is black, uppercase is white
 
-    std::array<Piece, 64> squares;
     Color nextMove;
-    bool castlingRightsWhiteShort = 0;
-    bool castlingRightsWhiteLong = 0;
-    bool castlingRightsBlackShort = 0;
-    bool castlingRightsBlackLong = 0;
-    int croissant;
-    int halfMoves;
     int fullMoves;
+    BoardState state;
 
     enum Fields {
-        squares = 0,
-        nextMove,
-        castling,
-        croissant,
-        halfMoves,
-        fullMoves = 6
+        _squares = 0,
+        _nextMove = 1,
+        _castlingRights = 2,
+        _croissant = 3,
+        _halfMoves = 4,
+        _fullMoves = 5
     };
-    std::string sfen = std::string(fen);
-    std::istringstream ss(sfen);
-    std::string field;
-    std::array<std::string_view, 7> fields; 
 
-    int index = 0;
-    while(ss >> field) {
-        fields[index++] = field;
-    }
+    std::vector<std::string> fields = utils::tokenize(fen.data());
 
-    // pieces
-    std::string_view p = fields[Fields::squares];
-    int index = 0;
-    for(int i = 0; i < p.length(); i++) {
-        if('a' <= p[i] <= 'Z') {
-            squares[index++] = charToPiece(p[i]);
-        } else if('0' <= p[i] - '0' <= '9') {
-            index += i;
+    // squares
+    std::string_view p = fields[Fields::_squares];
+    int squareIndex = 0;
+    for(std::size_t i = 0; i < p.length(); i++) {
+        if(('a' <= p[i] && p[i] <= 'z') || ('A' <= p[i] && p[i] <= 'Z')) {
+            Piece piece = utils::charToPiece(p[i]);
+            squares_[squareIndex] = piece;
+            // set bitboard bit
+            pieces_[piece.color][piece.ptype] |= (1ULL << squareIndex);
+            colors_[piece.color] |= (1ULL << squareIndex); 
+            squareIndex++;
+        } else if('0' <= p[i] && p[i] <= '9') {
+            squareIndex += p[i] - '0';
         } else if(p[i] == '/') {
             continue;
         }
     }
     // nextMove
-    switch(fields[Fields::nextMove].front()) {
-        case 'w': nextMove = Color::White; break;
-        case 'b': nextMove = Color::Black; break;
-        default: throw "should never throw";
+    switch(fields[Fields::_nextMove].front()) {
+        case 'w': nextMove = WHITE; break;
+        case 'b': nextMove = BLACK; break;
+        default: std::cout << "should never be here"; exit(1);
     }
-
     // castlingRights;
-    for(auto c: fields[Fields::castling]) {
+    for(auto c: fields[Fields::_castlingRights]) {
         switch(c) {
-            case 'k': castlingRightsBlackShort = true; break;
-            case 'q': castlingRightsBlackLong  = true; break;
-            case 'K': castlingRightsWhiteShort = true; break;
-            case 'Q': castlingRightsBlackShort = true; break;
+            case 'k': state.castlingRights |= CASTLE_BLACK_KING;  break;
+            case 'q': state.castlingRights |= CASTLE_BLACK_QUEEN; break;
+            case 'K': state.castlingRights |= CASTLE_WHITE_KING;  break;
+            case 'Q': state.castlingRights |= CASTLE_WHITE_QUEEN; break;
             case '-': break;
-            default: throw "should never throw";
+            default: std::cout << "should never be here"; exit(1);
         }
     }
     // croissant
     // get index of piece string
-    croissant = fields[Fields::croissant].front() == '-' ? 0
-        : std::distance(SQUARE_NAMES.begin(), std::find(SQUARE_NAMES.begin(), SQUARE_NAMES.end(), fields[Fields::croissant].data()));
+    state.croissant = fields[Fields::_croissant].front() == '-' ? NULL_SQUARE :
+        (Square)(std::distance(SQUARE_NAMES.begin(), std::find(SQUARE_NAMES.begin(), SQUARE_NAMES.end(), fields[Fields::_croissant].data())));
     // halfMoves
-    halfMoves = std::stoi(fields[Fields::halfMoves].data());
+    state.halfMoves = std::stoi(fields[Fields::_halfMoves].data());
 
     // fullMoves
-    fullMoves = std::stoi(fields[Fields::fullMoves].data());
+    fullMoves = std::stoi(fields[Fields::_fullMoves].data());
 
-    return {
-        squares,
-        nextMove,
-        castlingRightsWhiteLong,
-        castlingRightsWhiteLong,
-        castlingRightsBlackShort,
-        castlingRightsBlackLong,
-        croissant,
-        halfMoves,
-        fullMoves
+    state_ = state;
+    nextMove = nextMove;
+    fullMoves_ = fullMoves;
+}
+
+
+// TODO: FIX exporting repeated pieces
+std::string Board::exportFen() {
+    // squares
+    std::string squares = "";
+    for(int rank = 1; rank <= 8; rank++) {
+        for(int file = 1; file <= 8; file++) {
+            squares += utils::pieceToChar(squares_[(file-1)+(rank-1)*8]);
+        }
+        squares += '/';
+    }
+    // nextMove
+    std::string nextMove = (nextMove_ == WHITE ? "w" : "b");
+    // castlingRights
+    std::string castlingRights = "";
+    if(state_.castlingRights & CASTLE_WHITE_KING) {
+        castlingRights += 'K';
+    }
+    if(state_.castlingRights & CASTLE_WHITE_QUEEN) {
+        castlingRights += 'Q';
+    }
+    if(state_.castlingRights& CASTLE_BLACK_KING) {
+        castlingRights += 'k';
+    }
+    if(state_.castlingRights & CASTLE_BLACK_QUEEN) {
+        castlingRights += 'q';
+    }
+    // croissant
+    std::string croissant = (state_.croissant == NULL_SQUARE ? "-" : SQUARE_NAMES[state_.croissant].data());
+
+    // halfMoves
+    std::string halfMoves = "0";
+
+    // fullMoves
+    std::string fullMoves = "0";
+
+    return squares + " " + nextMove + " " + castlingRights + " " + croissant + " " + halfMoves + " " + fullMoves;
+}
+
+void Board::print() {
+    //    +-------------------------------+
+    //  8 | ♜ | ♞ | ♝ | ♚ | ♛ | ♝ | ♞ | ♜ |
+    //    |---+---+---+---+---+---+---+---|   
+    //  7 | ♟︎ | ♟︎ | ♟︎ | ♟︎ | ♟︎ | ♟︎ | ♟︎ | ♟︎ |
+    //    |---+---+---+---+---+---+---+---| 
+    //  6 |   |   |   |   |   |   |   |   |
+    //    |---+---+---+---+---+---+---+---|     
+    //  5 |   |   |   |   |   |   |   |   |
+    //    |---+---+---+---+---+---+---+---|        
+    //  4 |   |   |   |   |   |   |   |   |
+    //    |---+---+---+---+---+---+---+---|    
+    //  3 |   |   |   |   |   |   |   |   |
+    //    |---+---+---+---+---+---+---+---|   
+    //  2 | ♙ | ♙ | ♙ | ♙ | ♙ | ♙ | ♙ | ♙ |
+    //    |---+---+---+---+---+---+---+---|  
+    //  1 | ♖ | ♘ | ♗ | ♕ | ♔ | ♗ | ♘ | ♖ |  
+    //    +-------------------------------+
+    //      a   b   c   d   e   f   g   h   
+    if(pov_ == WHITE) {
+        std::cout << "\n\t  +-------------------------------+\n";
+        for(int rank = RANK8; rank >= RANK1; rank--) {
+            std::cout << "\t" << rank+1 << " |";
+            for(int file = FILEA; file <= FILEH; file++) {
+                std::cout << " " << utils::pieceToUnicode(squares_[file+rank*8]) << " |";
+            }
+            if(rank < RANK8) {
+                std::cout << "\n\t  |---+---+---+---+---+---+---+---|\n";
+            } else {
+                std::cout << "\n\t  +-------------------------------+\n";
+            }
+        }
+        std::cout << "\t    a   b   c   d   e   f   g   h \n\n";
+    } else {
+        std::cout << "\n\t  +-------------------------------+\n";
+        for(int rank = RANK1; rank <= RANK8; rank++) {
+            std::cout << "\t" << rank+1 << " |";
+            for(int file = FILEH; file >= FILEA; file--) {
+                std::cout << " " << utils::pieceToUnicode(squares_[file+rank*8]) << " |";
+            }
+            if(rank < RANK1) {
+                std::cout << "\n\t  |---+---+---+---+---+---+---+---|\n";
+            } else {
+                std::cout << "\n\t  +-------------------------------+\n";
+            }
+        }
+        std::cout << "\t    h   g   f   e   d   c   b   a \n\n";
     }
 }
 
-Color Board::oppColor(Color color) {
-    return static_cast<Color>(!static_cast<int>(color));
+int Board::evalPieceMaterial() {
+    return 200;
 }
-Piece Board::charToPiece(char c) {
-    using enum Piece;
-    switch(c) {
-        case 'p':   return BlackPawn; break;
-        case 'n': return BlackKnight; break;
-        case 'b': return BlackBishop; break;
-        case 'r':   return BlackRook; break;
-        case 'q':  return BlackQueen; break;
-        case 'k':   return BlackKing; break;
 
-        case 'P':   return WhitePawn; break;
-        case 'N': return WhiteKnight; break;
-        case 'B': return WhiteBishop; break;
-        case 'R':   return WhiteRook; break;
-        case 'Q':  return WhiteQueen; break;
-        case 'K':   return WhiteKing; break;
-        default: throw "should never throw";
-    }
+void Board::reversePov() {
+    pov_ = !pov_;
 }
