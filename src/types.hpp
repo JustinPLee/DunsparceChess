@@ -2,9 +2,13 @@
 
 #include <cstdint> // uint types
 
-//https://stackoverflow.com/a/72634204
+/**
+ * Global types
+*/
 
-
+/**
+ * Types for each piece, including a type for no piece
+*/
 enum PieceType {
     PAWN,
     KNIGHT,
@@ -16,6 +20,9 @@ enum PieceType {
     N_PIECES = 6,
 };
 
+/**
+ * Type of color, including a type for no color
+*/
 enum Color {
     BLACK = 0,
     WHITE = 1,
@@ -23,11 +30,17 @@ enum Color {
     N_COLORS = 2,
 };
 
+/**
+ * Piece struct is composed of a PieceType and a Color
+*/
 struct Piece {
-    PieceType ptype;
+    PieceType type;
     Color color;
 };
 
+/**
+ * Type for castling. Each type is stored as one bit.
+*/
 enum CastlingRights : uint8_t {
     CASTLE_BLACK_KING = 1,
     CASTLE_BLACK_QUEEN = 2,
@@ -35,6 +48,9 @@ enum CastlingRights : uint8_t {
     CASTLE_WHITE_QUEEN = 8
 };
 
+/**
+ * Type for identifying a Square. 
+*/
 enum Square {
     A1, B1, C1, D1, E1, F1, G1, H1,
     A2, B2, C2, D2, E2, F2, G2, H2,
@@ -44,9 +60,12 @@ enum Square {
     A6, B6, C6, D6, E6, F6, G6, H6,
     A7, B7, C7, D7, E7, F7, G7, H7,
     A8, B8, C8, D8, E8, F8, G8, H8,
-    N_SQUARES = 64, NULL_SQUARE
+    N_SQUARES = 64, NULL_SQUARE = 65
 };
 
+/**
+ * Type for a Direction. Relative to black pov by default.
+*/
 enum Direction {
     NORTH = 8,
     SOUTH = -8,
@@ -59,6 +78,9 @@ enum Direction {
     N_DIRECTIONS = 8
 };
 
+/**
+ * Type for a Rank.
+*/
 enum Rank {
     RANK1 = 0,
     RANK2,
@@ -71,6 +93,9 @@ enum Rank {
     N_RANKS = 8
 };
 
+/**
+ * Type for a File.
+*/
 enum File {
     FILEA = 0,
     FILEB,
@@ -83,6 +108,9 @@ enum File {
     N_FILES = 8
 };
 
+/**
+ * Type definition for a MoveType. Stored as a 32-bit int.
+*/
 struct MoveType {
     Square from;
     Square to;

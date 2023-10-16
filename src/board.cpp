@@ -65,7 +65,7 @@ void Board::processFen(std::string_view fen) {
             Piece piece = utils::charToPiece(p[i]);
             squares_[squareIndex] = piece;
             // set bitboard bit
-            pieces_[piece.color][piece.ptype] |= (1ULL << squareIndex);
+            pieces_[piece.color][piece.type] |= (1ULL << squareIndex);
             colors_[piece.color] |= (1ULL << squareIndex); 
             squareIndex++;
         } else if('0' <= p[i] && p[i] <= '9') {

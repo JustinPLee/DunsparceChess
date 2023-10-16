@@ -5,9 +5,6 @@
 #include "bitboard.hpp"
 #include "types.hpp"
 
-constexpr bool WHITE_MOVE = 0;
-constexpr bool BLACK_MOVE = 1;
-
 constexpr int PAWN_VALUE   = 100;
 constexpr int KNIGHT_VALUE = 320;
 constexpr int BISHOP_VALUE = 330;

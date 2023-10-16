@@ -18,7 +18,7 @@ namespace utils {
 
     inline char pieceToChar(Piece piece) {
         bool isBlack = (piece.color == BLACK);
-        switch(piece.ptype) {
+        switch(piece.type) {
             case PAWN:   return isBlack ? 'p' : 'P';
             case KNIGHT: return isBlack ? 'n' : 'N';
             case BISHOP: return isBlack ? 'b' : 'B';
@@ -50,7 +50,7 @@ namespace utils {
     }
     inline std::string pieceToUnicode(Piece piece) {
         bool isBlack = (piece.color == BLACK);
-        switch(piece.ptype) {
+        switch(piece.type) {
             case PAWN:   return isBlack ? "♟︎" : "♙";
             case KNIGHT: return isBlack ? "♞" : "♘";
             case BISHOP: return isBlack ? "♝" : "♗";
