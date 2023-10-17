@@ -35,25 +35,25 @@ class Board {
          * the croissant square, half moves, and full moves to the `Board` object.  
          * @param `std::string_view` Valid FEN string
         */
-        void process_fen(std::string_view fen);
+        void processFen(std::string_view fen);
 
         /** TODO:
          * Analyzes the current `Board` state and variables.
          * @return `std::string` Valid FEN string
         */
-        std::string export_fen();
+        std::string exportFen();
         
         /** TODO:
          * Returns the total piece material of one side
          * @return `int` Total piece value
          * @notetemplate <typename Color> ?
         */
-        int get_piece_material();
+        int getPieceMaterial();
 
         /**
          * Reverses the POV from white to black or black to white.
         */
-        void reverse_pov();
+        void reversePov();
 
         /**
          * Prints a pretty representation of all the current pieces' positions to the command-line.
@@ -71,11 +71,11 @@ class Board {
          * @param `Square` Any square
          * @return `Piece` Any piece
         */
-        Piece piece_at(Square square);
+        Piece pieceAt(Square square);
 
     private:
         /* bitboards */
-        void init_bitboards();
+        void initBitboards();
         // bitboard for every piece
         std::array<std::array<Bitboard, N_COLORS>, N_PIECES> pieces_;
         // occupancy bitboard for each color

@@ -9,15 +9,15 @@ Board::Board(std::string_view fen) {
 }
 
 void Board::init(std::string_view fen) {
-    init_bitboards();
-    process_fen(fen);
+    initBitboards();
+    processFen(fen);
 };
 
-void Board::init_bitboards() {
+void Board::initBitboards() {
     // set all piece bitboards to 0
     for(int color = 0; color < N_COLORS; ++color) {
         for(int ptype = 0; ptype < N_PIECES; ++ptype) {
-            pieces_[color][ptype] = uint64_t{0};
+            pieces_[color][ptype] = 0;
         }
     }
     // set each square to a null piece
@@ -26,19 +26,19 @@ void Board::init_bitboards() {
     }
 
     // set each color occupancy bitboard to 0
-    colors_[WHITE] = uint64_t{0};
-    colors_[BLACK] = uint64_t{0};
+    colors_[WHITE] = 0;
+    colors_[BLACK] = 0;
 
 }
 
 void Board::clear() {
-    init_bitboards();
+    initBitboards();
 
     state_ = BoardState{
         .castling_rights = CASTLE_BLACK_KING | CASTLE_BLACK_QUEEN | CASTLE_WHITE_KING | CASTLE_WHITE_QUEEN, /*all rights set to true by default*/
         .croissant = NULL_SQUARE,
         .half_moves = 0,
-        .zobrist_key = uint64_t{0}
+        .zobrist_key = 0
     };
 
     full_moves_ = 0;
@@ -46,7 +46,7 @@ void Board::clear() {
     pov_ = WHITE;
 }
 
-void Board::process_fen(std::string_view fen) {
+void Board::processFen(std::string_view fen) {
     // Example starting FEN: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0
 
     Color next_move;
@@ -56,23 +56,23 @@ void Board::process_fen(std::string_view fen) {
     std::vector<std::string> fields = utils::tokenize(fen.data());
     // corresponding fields for each section of the FEN string
     enum Fields {
-        _squares = 0,
-        _next_move = 1,
-        _castling_rights = 2,
-        _croissant = 3,
-        _half_moves = 4,
-        _full_moves = 5
+        i_squares = 0,
+        i_next_move = 1,
+        i_castling_rights = 2,
+        i_croissant = 3,
+        i_half_moves = 4,
+        i_full_moves = 5
     };
 
     // squares
-    std::string_view p = fields[Fields::_squares];
+    std::string_view p = fields[Fields::i_squares];
     int squareIndex = 0;
     // If the character is a letter, set the according piece bitboard's
     // and color occupany bitboard's bit to 1 and add that piece to the
     // square position array. If the character is a digit, skip that many bits.
     for(std::size_t i = 0; i < p.length(); ++i) {
         if(('a' <= p[i] && p[i] <= 'z') || ('A' <= p[i] && p[i] <= 'Z')) {
-            Piece piece = utils::char_to_piece(p[i]);
+            Piece piece = utils::charToPiece(p[i]);
             squares_[squareIndex] = piece;
             // set bitboard bit
             pieces_[piece.color][piece.type] |= (1ULL << squareIndex);
@@ -86,14 +86,14 @@ void Board::process_fen(std::string_view fen) {
     }
 
     // nextMove
-    switch(fields[Fields::_next_move].front()) {
+    switch(fields[Fields::i_next_move].front()) {
         case 'w': next_move = WHITE; break;
         case 'b': next_move = BLACK; break;
         default: std::cout << "invalid FEN string"; exit(1);
     }
 
     // castlingRights;
-    for(auto c: fields[Fields::_castling_rights]) {
+    for(auto c: fields[Fields::i_castling_rights]) {
         switch(c) {
             case 'k': state.castling_rights |= CASTLE_BLACK_KING;  break;
             case 'q': state.castling_rights |= CASTLE_BLACK_QUEEN; break;
@@ -105,14 +105,14 @@ void Board::process_fen(std::string_view fen) {
     }
 
     // croissant
-    state.croissant = fields[Fields::_croissant].front() == '-' ? NULL_SQUARE :
-        Square((std::distance(SQUARE_NAMES.begin(), std::find(SQUARE_NAMES.begin(), SQUARE_NAMES.end(), fields[Fields::_croissant].data()))));
+    state.croissant = fields[Fields::i_croissant].front() == '-' ? NULL_SQUARE :
+        Square((std::distance(SQUARE_NAMES.begin(), std::find(SQUARE_NAMES.begin(), SQUARE_NAMES.end(), fields[Fields::i_croissant].data()))));
 
     // halfMoves
-    state.half_moves = std::stoi(fields[Fields::_half_moves].data());
+    state.half_moves = std::stoi(fields[Fields::i_half_moves].data());
 
     // fullMoves
-    full_moves = std::stoi(fields[Fields::_full_moves].data());
+    full_moves = std::stoi(fields[Fields::i_full_moves].data());
 
     state_ = state;
     next_move = next_move;
@@ -121,12 +121,12 @@ void Board::process_fen(std::string_view fen) {
 
 
 // TODO: FIX exporting repeated pieces
-std::string Board::export_fen() {
+std::string Board::exportFen() {
     // squares
     std::string squares = "";
     for(int rank = RANK1; rank <= RANK8; ++rank) {
         for(int file = FILEA; file <= FILEH; ++file) {
-            squares += utils::piece_to_char(squares_[(file-1)+(rank-1)*8]);
+            squares += utils::pieceToChar(squares_[(file-1)+(rank-1)*8]);
         }
         squares += '/';
     }
@@ -187,7 +187,7 @@ void Board::print() {
         for(int rank = RANK8; rank >= RANK1; --rank) {
             std::cout << "\t" << rank+1 << " |";
             for(int file = FILEA; file <= FILEH; ++file) {
-                std::cout << " " << utils::piece_to_unicode(squares_[file+rank*8]) << " |";
+                std::cout << " " << utils::pieceToUnicode(squares_[file+rank*8]) << " |";
             }
             if(rank < RANK8) {
                 std::cout << "\n\t  |---+---+---+---+---+---+---+---|\n";
@@ -202,7 +202,7 @@ void Board::print() {
         for(int rank = RANK1; rank <= RANK8; ++rank) {
             std::cout << "\t" << rank+1 << " |";
             for(int file = FILEH; file >= FILEA; --file) {
-                std::cout << " " << utils::piece_to_unicode(squares_[file+rank*8]) << " |";
+                std::cout << " " << utils::pieceToUnicode(squares_[file+rank*8]) << " |";
             }
             if(rank < RANK1) {
                 std::cout << "\n\t  |---+---+---+---+---+---+---+---|\n";
@@ -214,14 +214,14 @@ void Board::print() {
     }
 }
 
-int Board::get_piece_material() {
+int Board::getPieceMaterial() {
     return 200;
 }
 
-void Board::reverse_pov() {
+void Board::reversePov() {
     pov_ = !pov_;
 }
 
-Piece Board::piece_at(Square square) {
+Piece Board::pieceAt(Square square) {
     return squares_[square];
 }

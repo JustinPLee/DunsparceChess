@@ -1,1 +1,4 @@
 g++ -g -Wall --std=c++20 main.cpp src/board.cpp
+
+test:
+g++ -g -Wall --std=c++20 tests/tests.cpp src/board.cpp src/move.cpp src/uci.cpp

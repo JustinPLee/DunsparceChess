@@ -1,5 +1,6 @@
 #pragma once
 
+#include "utils.hpp"
 #include "types.hpp"
 
 /**
@@ -11,57 +12,101 @@ class Move {
         explicit Move(MoveType data);
 
         /**
-         * @return `Square` Square of the initial square of the piece performing the move
+         * @returns `Square` Square of the initial square of the piece performing the move
         */
-        Square get_from_square() const;
+        Square getFromSquare() const;
 
         /**
-         * @return `Square` Square of the destination square of the piece performing the move
+         * @returns `Square` Square of the destination square of the piece performing the move
         */
-        Square get_to_square() const;
+        Square getToSquare() const;
 
         /**
-         * @return `Piece` Piece performing the move
+         * @returns `Piece` Piece performing the move
         */
-        Piece get_piece() const;
+        Piece getPiece() const;
 
         /**
-         * @return `Piece` Captured piece, if any
+         * @returns `Piece` Captured piece, if any
         */
-        Piece get_captured_piece() const;
+        Piece getCapturedPiece() const;
 
         /**
-         * @return `Piece` Promoted piece, if any
+         * @returns `Piece` Promoted piece, if any
         */
-        Piece get_promoted_piece() const;
+        Piece getPromotedPiece() const;
 
         /**
-         * @return `bool` Returns true if the move is a capture
+         * @param `Square` Square of the initial square of the piece performing the move
         */
-        bool is_capture() const;
+        void setFromSquare(Square square);
 
         /**
-         * @return `bool` Returns true if the move is a promotion
+         * @param `Square` Square of the destination square of the piece performing the move
         */
-        bool is_promotion() const;
+        void setToSquare(Square square);
 
         /**
-         * @return `bool` Returns true if the move is a double push
+         * @param `Piece` Piece performing the move
         */
-        bool is_double_push() const;
+        void setPiece(Piece piece);
 
         /**
-         * @return `bool` Returns true if the move is any type of castling
+         * @param `Piece` Captured piece, if any
         */
-        bool is_castle() const;
+        void setCapturedPiece(Piece piece);
+
+        /**
+         * @param `Piece` Promoted piece, if any
+        */
+        void setPromotedPiece(Piece piece);
+
+        /**
+         * @returns `bool` Returns true if the move is a capture
+        */
+        bool isCapture() const;
+
+        /**
+         * @returns `bool` Returns true if the move is a promotion
+        */
+        bool isPromotion() const;
+
+        /**
+         * @returns `bool` Returns true if the move is a double push
+        */
+        bool isDoublePush() const;
+
+        /**
+         * @returns `bool` Returns true if the move is any type of castling
+        */
+        bool isCastle() const;
         
         /**
-         * @return `bool` Returns true if the move is a croissant
+         * @returns `bool` Returns true if the move is a croissant
         */
-        bool is_croissant() const;
+        bool isCroissant() const;
+
+        /**
+         * @param `bool` Returns true if the move is a double push
+        */
+        void setIsDoublePush(bool is_double_push);
+
+        /**
+         * @param `bool` Returns true if the move is any type of castling
+        */
+        void setIsCastle(bool is_castle);
+        
+        /**
+         * @param `bool` Returns true if the move is a croissant
+        */
+        void setIsCroissant(bool is_croissant);
 
         inline bool operator==(const Move& other) { return move_ == other.move_; }
         inline bool operator!=(const Move& other) { return !(move_ == other.move_); }
+
+        void print() {
+            utils::printBits(move_);
+        };
         
     private:
         // all move data is encoded in one 32 bit number

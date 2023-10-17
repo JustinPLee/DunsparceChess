@@ -26,17 +26,19 @@ enum PieceType {
 enum Color {
     BLACK = 0,
     WHITE = 1,
-    NULL_COLOR = 2,
+    NULL_COLOR = 0,
     N_COLORS = 2,
 };
 
 /**
- * Piece struct is composed of a PieceType and a Color
+ * Piece class is composed of a PieceType and a Color
 */
 struct Piece {
     PieceType type;
     Color color;
 };
+inline bool operator==(const Piece& lhs, const Piece& rhs) { return lhs.type == rhs.type && lhs.color == rhs.color; }
+inline bool operator!=(const Piece& lhs, const Piece& rhs) { return !(lhs == rhs); }
 
 /**
  * Type for identifying a Square. 

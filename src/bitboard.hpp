@@ -1,5 +1,6 @@
 #pragma once
 
+#include "utils.hpp"
 #include "types.hpp"
 
 /**
@@ -10,17 +11,18 @@ class Bitboard {
     public:
         explicit inline Bitboard(uint64_t board = uint64_t{0}) : board_{board} {}
 
-        inline int get_least_significant_bit() const { return lsb(); }
+        inline int getLeastSignificantBit() const { return lsb(); }
         inline int lsb() const { return board_ & -board_; }
         
         inline int popcount() const {
-            // No comprendo: https://stackoverflow.com/a/109025
-            uint64_t i = board_;
-            i = i - ((i >> 1) & 0x55555555);
-            i = (i & 0x33333333) + ((i >> 2) & 0x33333333);
-            i = (i + (i >> 4)) & 0x0F0F0F0F;
-            i *= 0x01010101;
-            return  i >> 24;
+            // slow popcount
+            uint64_t cpy = board_;
+            int count = 0;
+            while(cpy > 0) {
+                cpy >>= 1;
+                ++count;
+            }
+            return count;
         }
 
         inline void print() const {
@@ -33,15 +35,17 @@ class Bitboard {
             }
         }
 
-        inline Bitboard& operator=(uint64_t board) { board_ = board_; return *this; }
+        inline bool empty() const { return board_ == 0; }
+
+        inline Bitboard& operator=(uint64_t rhs) { board_ = rhs; return *this; }
         inline Bitboard& operator=(const Bitboard& other) { board_ = other.board_; return *this; }
 
         inline Bitboard operator~ () const { return Bitboard(~board_); }
-        inline Bitboard operator& (uint64_t rhs) const { return Bitboard(board_ & rhs); }
-        inline Bitboard operator| (uint64_t rhs) const { return Bitboard(board_ | rhs); }
-        inline Bitboard operator^ (uint64_t rhs) const { return Bitboard(board_ ^ rhs); }
-        inline Bitboard operator<< (uint64_t rhs) const { return Bitboard(board_ << rhs); }
-        inline Bitboard operator>> (uint64_t rhs) const { return Bitboard(board_ >> rhs); }
+        inline Bitboard operator& (int rhs) const { return Bitboard(board_ & rhs); }
+        inline Bitboard operator| (int rhs) const { return Bitboard(board_ | rhs); }
+        inline Bitboard operator^ (int rhs) const { return Bitboard(board_ ^ rhs); }
+        inline Bitboard operator<< (int rhs) const { return Bitboard(board_ << rhs); }
+        inline Bitboard operator>> (int rhs) const { return Bitboard(board_ >> rhs); }
 
         inline Bitboard& operator&= (uint64_t rhs) { Bitboard(board_ &= rhs); return *this; }
         inline Bitboard& operator|= (uint64_t rhs) { Bitboard(board_ |= rhs); return *this; }
@@ -66,7 +70,8 @@ class Bitboard {
         inline bool operator==(const Bitboard& other) const { return board_ == other.board_; }
         inline bool operator!=(const Bitboard& other) const { return board_ != other.board_; }
 
-        inline bool empty() const { return board_ == 0; }
+        friend inline std::ostream& operator<<(std::ostream& out, const Bitboard& rhs) { utils::printBits(rhs.board_); return out; }
+
 
     private:
         uint64_t board_{0};

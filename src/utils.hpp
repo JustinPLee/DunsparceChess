@@ -3,24 +3,25 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <iostream>
 
 #include "types.hpp"
 
 namespace utils {
 
-    inline Square get_square(Rank rank, File file) {
+    inline Square getSquare(Rank rank, File file) {
         return Square(rank + 8 * file);
     }
 
-    inline Rank get_rank(Square square) {
+    inline Rank getRank(Square square) {
         return Rank(1);
     }
 
-    inline File get_file(Square square) {
+    inline File getFile(Square square) {
         return File(1);
     }
 
-    inline char piece_to_char(Piece piece) {
+    inline char pieceToChar(Piece piece) {
         bool is_black = (piece.color == BLACK);
         switch(piece.type) {
             case PAWN:   return is_black ? 'p' : 'P';
@@ -34,7 +35,7 @@ namespace utils {
         }
     }
 
-    inline Piece char_to_piece(char c) {
+    inline Piece charToPiece(char c) {
         switch(c) {
             case 'p': return { PAWN, BLACK };
             case 'n': return { KNIGHT, BLACK };
@@ -53,7 +54,7 @@ namespace utils {
         }
     }
 
-    inline std::string piece_to_unicode(Piece piece) {
+    inline std::string pieceToUnicode(Piece piece) {
         bool is_black = (piece.color == BLACK);
         switch(piece.type) {
             case PAWN:   return is_black ? "♟︎" : "♙";
@@ -75,5 +76,14 @@ namespace utils {
             tokens.push_back(value);
         }
         return tokens;
+    }
+
+    inline void printBits(uint64_t bits) {
+        std::string s = "";
+        while(bits > 0) {
+            s = std::to_string(bits & 1) + s;
+            bits >>= 1;
+        }
+        std::cout << (s == "" ? 0 : s);
     }
 }
