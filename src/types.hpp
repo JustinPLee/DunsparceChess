@@ -39,16 +39,6 @@ struct Piece {
 };
 
 /**
- * Type for castling. Each type is stored as one bit.
-*/
-enum CastlingRights : uint8_t {
-    CASTLE_BLACK_KING = 1,
-    CASTLE_BLACK_QUEEN = 2,
-    CASTLE_WHITE_KING = 4,
-    CASTLE_WHITE_QUEEN = 8
-};
-
-/**
  * Type for identifying a Square. 
 */
 enum Square {
@@ -117,7 +107,7 @@ struct MoveType {
     Piece piece;
     Piece captured;
     Piece promoted;
-    bool isDoublePush;
-    bool isCroissant;
-    bool isCastle;
+    bool is_double_push;
+    bool is_croissant;
+    bool is_castle;
 };

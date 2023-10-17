@@ -2,48 +2,19 @@
 
 #include "types.hpp"
 
+/**
+ * Header only Bitboard class.
+ * Supports all native bit operators, lsb, and popcount
+*/
 class Bitboard {
     public:
-        inline Bitboard(uint64_t board = 0x0) : board_{board} {}
-        inline Bitboard& operator=(uint64_t board) { board_ = board_; return *this; }
-        inline Bitboard& operator=(const Bitboard& other) { board_ = other.board_; return *this; }
+        explicit inline Bitboard(uint64_t board = uint64_t{0}) : board_{board} {}
 
-        inline Bitboard operator~ () const { return ~board_; }
-        inline Bitboard operator& (uint64_t rhs) const { return board_ & rhs; }
-        inline Bitboard operator| (uint64_t rhs) const { return board_ | rhs; }
-        inline Bitboard operator^ (uint64_t rhs) const { return board_ ^ rhs; }
-        inline Bitboard operator<< (uint64_t rhs) const { return board_ << rhs; }
-        inline Bitboard operator>> (uint64_t rhs) const { return board_ >> rhs; }
-
-        inline Bitboard& operator&= (uint64_t rhs) { board_ &= rhs; return *this; }
-        inline Bitboard& operator|= (uint64_t rhs) { board_ |= rhs; return *this; }
-        inline Bitboard& operator^= (uint64_t rhs) { board_ ^= rhs; return *this; }
-        inline Bitboard& operator<<= (uint64_t rhs) { board_ <<= rhs; return *this; }
-        inline Bitboard& operator>>= (uint64_t rhs) { board_ >>= rhs; return *this; }
-
-        inline Bitboard operator& (const Bitboard& other) const { return board_ & other.board_; }
-        inline Bitboard operator| (const Bitboard& other) const { return board_ | other.board_; }
-        inline Bitboard operator^ (const Bitboard& other) const { return board_ ^ other.board_; }
-        inline Bitboard operator<< (const Bitboard& other) const { return board_ << other.board_; }
-        inline Bitboard operator>> (const Bitboard& other) const { return board_ >> other.board_; }
-
-        inline Bitboard& operator&= (const Bitboard& other) { board_ &= other.board_; return *this; }
-        inline Bitboard& operator|= (const Bitboard& other) { board_ |= other.board_; return *this; }
-        inline Bitboard& operator^= (const Bitboard& other) { board_ ^= other.board_; return *this; }
-        inline Bitboard& operator<<= (const Bitboard& other) { board_ <<= other.board_; return *this; }
-        inline Bitboard& operator>>= (const Bitboard& other) { board_ >>= other.board_; return *this; }
-
-        inline bool operator==(uint64_t rhs) const { return board_ == rhs; }
-        inline bool operator!=(uint64_t rhs) const { return board_ != rhs; }
-        inline bool operator==(const Bitboard& other) const { return board_ == other.board_; }
-        inline bool operator!=(const Bitboard& other) const { return board_ != other.board_; }
-
-        inline bool empty() const { return board_ == 0; }
-
-        inline int getLeastSignificantBit() const { return board_ & -board_; }
+        inline int get_least_significant_bit() const { return lsb(); }
+        inline int lsb() const { return board_ & -board_; }
         
         inline int popcount() const {
-            // https://stackoverflow.com/a/109025
+            // No comprendo: https://stackoverflow.com/a/109025
             uint64_t i = board_;
             i = i - ((i >> 1) & 0x55555555);
             i = (i & 0x33333333) + ((i >> 2) & 0x33333333);
@@ -61,6 +32,41 @@ class Bitboard {
                 std::cout << '\n';
             }
         }
+
+        inline Bitboard& operator=(uint64_t board) { board_ = board_; return *this; }
+        inline Bitboard& operator=(const Bitboard& other) { board_ = other.board_; return *this; }
+
+        inline Bitboard operator~ () const { return Bitboard(~board_); }
+        inline Bitboard operator& (uint64_t rhs) const { return Bitboard(board_ & rhs); }
+        inline Bitboard operator| (uint64_t rhs) const { return Bitboard(board_ | rhs); }
+        inline Bitboard operator^ (uint64_t rhs) const { return Bitboard(board_ ^ rhs); }
+        inline Bitboard operator<< (uint64_t rhs) const { return Bitboard(board_ << rhs); }
+        inline Bitboard operator>> (uint64_t rhs) const { return Bitboard(board_ >> rhs); }
+
+        inline Bitboard& operator&= (uint64_t rhs) { Bitboard(board_ &= rhs); return *this; }
+        inline Bitboard& operator|= (uint64_t rhs) { Bitboard(board_ |= rhs); return *this; }
+        inline Bitboard& operator^= (uint64_t rhs) { Bitboard(board_ ^= rhs); return *this; }
+        inline Bitboard& operator<<= (uint64_t rhs) { Bitboard(board_ <<= rhs); return *this; }
+        inline Bitboard& operator>>= (uint64_t rhs) { Bitboard(board_ >>= rhs); return *this; }
+
+        inline Bitboard operator& (const Bitboard& other) const { return Bitboard(board_ & other.board_); }
+        inline Bitboard operator| (const Bitboard& other) const { return Bitboard(board_ | other.board_); }
+        inline Bitboard operator^ (const Bitboard& other) const { return Bitboard(board_ ^ other.board_); }
+        inline Bitboard operator<< (const Bitboard& other) const { return Bitboard(board_ << other.board_); }
+        inline Bitboard operator>> (const Bitboard& other) const { return Bitboard(board_ >> other.board_); }
+
+        inline Bitboard& operator&= (const Bitboard& other) { Bitboard(board_ &= other.board_); return *this; }
+        inline Bitboard& operator|= (const Bitboard& other) { Bitboard(board_ |= other.board_); return *this; }
+        inline Bitboard& operator^= (const Bitboard& other) { Bitboard(board_ ^= other.board_); return *this; }
+        inline Bitboard& operator<<= (const Bitboard& other) { Bitboard(board_ <<= other.board_); return *this; }
+        inline Bitboard& operator>>= (const Bitboard& other) { Bitboard(board_ >>= other.board_); return *this; }
+
+        inline bool operator==(uint64_t rhs) const { return board_ == rhs; }
+        inline bool operator!=(uint64_t rhs) const { return board_ != rhs; }
+        inline bool operator==(const Bitboard& other) const { return board_ == other.board_; }
+        inline bool operator!=(const Bitboard& other) const { return board_ != other.board_; }
+
+        inline bool empty() const { return board_ == 0; }
 
     private:
         uint64_t board_{0};

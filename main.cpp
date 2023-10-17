@@ -1,4 +1,5 @@
 #include <iostream>
+
 #include "src/board.hpp"
 #include "src/constants.hpp"
 

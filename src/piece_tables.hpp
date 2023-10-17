@@ -2,6 +2,13 @@
 
 #include <array>
 
+/**
+ * Piece Tables
+ * Basic way of evaluating the favoredness of a piece's location
+ * Postitive values favor white and negative values favor black
+ * Default orientation is white (looking up)
+*/
+
 constexpr std::array<int, 64> PAWN_TABLE {
     0,  0,  0,  0,  0,  0,  0,  0,
     50, 50, 50, 50, 50, 50, 50, 50,
@@ -55,17 +62,6 @@ constexpr std::array<int, 64> QUEEN_TABLE {
     -10,  5,  5,  5,  5,  5,  0,-10,
     -10,  0,  5,  0,  0,  0,  0,-10,
     -20,-10,-10, -5, -5,-10,-10,-20
-};
-
-constexpr std::array<int, 64> PAWN_TABLE {
-    0,  0,  0,  0,  0,  0,  0,  0,
-    50, 50, 50, 50, 50, 50, 50, 50,
-    10, 10, 20, 30, 30, 20, 10, 10,
-    5,  5, 10, 25, 25, 10,  5,  5,
-    0,  0,  0, 20, 20,  0,  0,  0,
-    5, -5,-10,  0,  0,-10, -5,  5,
-    5, 10, 10,-20,-20, 10, 10,  5,
-    0,  0,  0,  0,  0,  0,  0,  0
 };
 
 constexpr std::array<int, 64> KING_TABLE_MID {
