@@ -3,7 +3,6 @@
 #include <array>
 #include <string_view>
 
-#include "bitboard.hpp"
 #include "types.hpp"
 
 namespace dunsparce {
@@ -40,25 +39,25 @@ constexpr std::array<std::string_view, 64> SQUARE_NAMES = {
 /**
  *  Files and Ranks
 */
-constexpr uint64_t FILEA_BB = 0x0101010101010101ULL;
-constexpr uint64_t FILEB_BB = FILEA_BB << 1;
-constexpr uint64_t FILEC_BB = FILEA_BB << 2;
-constexpr uint64_t FILED_BB = FILEA_BB << 3;
-constexpr uint64_t FILEE_BB = FILEA_BB << 4;
-constexpr uint64_t FILEF_BB = FILEA_BB << 5;
-constexpr uint64_t FILEG_BB = FILEA_BB << 6;
-constexpr uint64_t FILEH_BB = FILEA_BB << 7;
-constexpr std::array<uint64_t, 64> FILES = { FILEA_BB, FILEB_BB, FILEC_BB, FILED_BB, FILEE_BB, FILEF_BB, FILEG_BB, FILEH_BB};
+constexpr StaticBB FILEA_BB = 0x0101010101010101ULL;
+constexpr StaticBB FILEB_BB = FILEA_BB << 1;
+constexpr StaticBB FILEC_BB = FILEA_BB << 2;
+constexpr StaticBB FILED_BB = FILEA_BB << 3;
+constexpr StaticBB FILEE_BB = FILEA_BB << 4;
+constexpr StaticBB FILEF_BB = FILEA_BB << 5;
+constexpr StaticBB FILEG_BB = FILEA_BB << 6;
+constexpr StaticBB FILEH_BB = FILEA_BB << 7;
+constexpr std::array<StaticBB, 64> FILES = { FILEA_BB, FILEB_BB, FILEC_BB, FILED_BB, FILEE_BB, FILEF_BB, FILEG_BB, FILEH_BB};
 
-constexpr uint64_t RANK1_BB = 0xFF;
-constexpr uint64_t RANK2_BB = RANK1_BB << (8 * 1);
-constexpr uint64_t RANK3_BB = RANK1_BB << (8 * 2);
-constexpr uint64_t RANK4_BB = RANK1_BB << (8 * 3);
-constexpr uint64_t RANK5_BB = RANK1_BB << (8 * 4);
-constexpr uint64_t RANK6_BB = RANK1_BB << (8 * 5);
-constexpr uint64_t RANK7_BB = RANK1_BB << (8 * 6);
-constexpr uint64_t RANK8_BB = RANK1_BB << (8 * 7);
-constexpr std::array<uint64_t, 64> RANKS = { RANK1_BB, RANK2_BB, RANK3_BB, RANK4_BB, RANK5_BB, RANK6_BB, RANK7_BB, RANK8_BB };
+constexpr StaticBB RANK1_BB = 0xFF;
+constexpr StaticBB RANK2_BB = RANK1_BB << (8 * 1);
+constexpr StaticBB RANK3_BB = RANK1_BB << (8 * 2);
+constexpr StaticBB RANK4_BB = RANK1_BB << (8 * 3);
+constexpr StaticBB RANK5_BB = RANK1_BB << (8 * 4);
+constexpr StaticBB RANK6_BB = RANK1_BB << (8 * 5);
+constexpr StaticBB RANK7_BB = RANK1_BB << (8 * 6);
+constexpr StaticBB RANK8_BB = RANK1_BB << (8 * 7);
+constexpr std::array<StaticBB, 64> RANKS = { RANK1_BB, RANK2_BB, RANK3_BB, RANK4_BB, RANK5_BB, RANK6_BB, RANK7_BB, RANK8_BB };
 
 /** 
  *  Castling

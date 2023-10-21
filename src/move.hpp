@@ -11,6 +11,7 @@ namespace dunsparce {
 class Move {
     public:
         Move();
+        Move(Square from, Square to, Piece piece, Piece captured, Piece promoted, bool isDoublePush, bool isCroissant, bool isCastle);
         explicit Move(MoveType data);
 
         Square getFromSquare() const;
@@ -24,8 +25,8 @@ class Move {
         void setToSquare(Square square);
 
         void setPiece(Piece piece);
-        void setCapturedPiece(Piece piece);
-        void setPromotedPiece(Piece piece);
+        void setCapturePiece(Piece piece);
+        void setPromotionPiece(Piece piece);
         void setIsDoublePush(bool is_double_push);
         void setIsCastle(bool is_castle);
         void setIsCroissant(bool is_croissant);

@@ -40,8 +40,8 @@ void Board::clear() {
 }
 
 void Board::updatePieceAndColorBitboards(Piece piece, Square square) {
-    pieces_[piece.color][piece.type].set(square);
-    occupancies_[piece.color].set(square); 
+    pieces_[piece.color][piece.type] |= (uint64_t{1} << square);
+    occupancies_[piece.color] |= (uint64_t{1} << square); 
 }
 
 void Board::processFen(std::string_view fen) {

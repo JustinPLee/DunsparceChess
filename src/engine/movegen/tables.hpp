@@ -2,33 +2,28 @@
 
 #include <array>
 
-#include "bitboard.hpp"
-#include "types.hpp"
+#include "../../types.hpp"
 
 namespace dunsparce::tables {
 
-namespace dunsparce::tables::attacks {
-    std::array<StaticBB, 64> WHITE_PAWN{};
-    std::array<StaticBB, 64> BLACK_PAWN{};
-    std::array<StaticBB, 64> KNIGHT{};
-    std::array<StaticBB, 64> KING{};
-    std::array<std::array<StaticBB, 64>, 64> RANK{};
-    std::array<std::array<StaticBB, 64>, 64> FILE{};
-    std::array<std::array<StaticBB, 64>, 64> DIAGA8H1{};
-    std::array<std::array<StaticBB, 64>, 64> DIAGA1H8{};
-
+namespace attacks {
+    std::array<std::array<Bitboard, 64>, 2> PAWN{};
+    std::array<std::array<Bitboard, 64>, 2> KNIGHT{};
+    std::array<std::array<Bitboard, 64>, 2> KING{};
+    std::array<std::array<Bitboard, 64>, 64> RANK{};
+    std::array<std::array<Bitboard, 64>, 64> FILE{};
+    std::array<std::array<Bitboard, 64>, 64> DIAGA8H1{};
+    std::array<std::array<Bitboard, 64>, 64> DIAGA1H8{};
 } // ::attacks
 
-namespace dunsparce::tables::moves {
+namespace moves {
 
-    std::array<StaticBB, 64> BLACK_PAWN_SINGLE{};
-    std::array<StaticBB, 64> BLACK_PAWN_DOUBLE{};
-    std::array<StaticBB, 64> WHITE_PAWN_SINGLE{};
-    std::array<StaticBB, 64> WHITE_PAWN_DOUBLE{};
+    std::array<std::array<Bitboard, 64>, 2> PAWN_SINGLE{};
+    std::array<std::array<Bitboard, 64>, 2> PAWN_DOUBLE{};
 
 } // ::moves
 
-namespace dunsparce::tables::magics {
+namespace magics {
     constexpr std::array<StaticBB, 8> FILE = {
         0x8040201008040200,
         0x4020100804020100,
@@ -78,21 +73,21 @@ namespace dunsparce::tables::magics {
 
 } // ::magics
 
-namespace dunsparce::tables::masks {
+namespace masks {
 
-    std::array<StaticBB, 64> RANK{};
-    std::array<StaticBB, 64> FILE{};
-    std::array<StaticBB, 64> FILE_MAGIC{};
-    std::array<StaticBB, 64> DIAGA8H1{};
-    std::array<StaticBB, 64> DIAGA8H1_MAGIC{};
-    std::array<StaticBB, 64> DIAGA1H8{};
-    std::array<StaticBB, 64> DIAGA1H8_MAGIC{};
+    std::array<Bitboard, 64> RANK{};
+    std::array<Bitboard, 64> FILE{};
+    std::array<Bitboard, 64> FILE_MAGIC{};
+    std::array<Bitboard, 64> DIAGA8H1{};
+    std::array<Bitboard, 64> DIAGA8H1_MAGIC{};
+    std::array<Bitboard, 64> DIAGA1H8{};
+    std::array<Bitboard, 64> DIAGA1H8_MAGIC{};
     
     // used for castling
-    std::array<StaticBB, 2> maskEG{};
-    std::array<StaticBB, 2> maskFG{};
-    std::array<StaticBB, 2> maskBD{};
-    std::array<StaticBB, 2> maskCE{};
+    std::array<Bitboard, 2> EG{};
+    std::array<Bitboard, 2> FG{};
+    std::array<Bitboard, 2> BD{};
+    std::array<Bitboard, 2> CE{};
 
 } // ::masks
 

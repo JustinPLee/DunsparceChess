@@ -5,7 +5,6 @@
 
 #include "types.hpp"
 #include "constants.hpp"
-#include "bitboard.hpp"
 
 namespace dunsparce {
 /**
@@ -17,6 +16,7 @@ class Board {
         // defaults for essential board information
         // copied and modiified in move gen and eval
         struct BoardState {
+            // 1 2 4 8
             uint8_t castling_rights = CASTLE_BLACK_KING | CASTLE_BLACK_QUEEN | CASTLE_WHITE_KING | CASTLE_WHITE_QUEEN;
             Square croissant = NULL_SQUARE;
             int half_moves = 0;
@@ -76,7 +76,7 @@ class Board {
 
         uint64_t generateZobristKey();
         
-        inline Piece pieceAt(Square square) { return squares_[square]; };
+        inline Piece pieceAt(Square square) const { return squares_[square]; };
 
         inline BoardState getState() const { return state_; }
         inline Color getColor() const { return next_move_; }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 #include "utils.hpp"
 #include "types.hpp"
 namespace dunsparce {
@@ -47,16 +49,48 @@ class Bitboard {
             return Square(index64[((board_ ^ (board_ - 1)) * debruijn64) >> 58]);
         }
 
+        inline void clearBit(Square square) { board_ ^= (uint64_t{1} << (N_SQUARES - int{square})); }
+
         int popcount() const;
         void print() const;
+
+        inline Bitboard& operator=(uint64_t rhs) { board_ = rhs; return *this; }
+        inline Bitboard& operator=(const Bitboard& other) { board_ = other.board_; return *this; }
+
+        inline Bitboard operator~ () const { return Bitboard(~board_); }
+        inline Bitboard operator& (int rhs) const { return Bitboard(board_ & rhs); }
+        inline Bitboard operator| (int rhs) const { return Bitboard(board_ | rhs); }
+        inline Bitboard operator^ (int rhs) const { return Bitboard(board_ ^ rhs); }
+        inline Bitboard operator<< (int rhs) const { return Bitboard(board_ << rhs); }
+        inline Bitboard operator>> (int rhs) const { return Bitboard(board_ >> rhs); }
+
+        inline Bitboard& operator&= (uint64_t rhs) { Bitboard(board_ &= rhs); return *this; }
+        inline Bitboard& operator|= (uint64_t rhs) { Bitboard(board_ |= rhs); return *this; }
+        inline Bitboard& operator^= (uint64_t rhs) { Bitboard(board_ ^= rhs); return *this; }
+        inline Bitboard& operator<<= (uint64_t rhs) { Bitboard(board_ <<= rhs); return *this; }
+        inline Bitboard& operator>>= (uint64_t rhs) { Bitboard(board_ >>= rhs); return *this; }
+
+        inline Bitboard operator& (const Bitboard& other) const { return Bitboard(board_ & other.board_); }
+        inline Bitboard operator| (const Bitboard& other) const { return Bitboard(board_ | other.board_); }
+        inline Bitboard operator^ (const Bitboard& other) const { return Bitboard(board_ ^ other.board_); }
+        inline Bitboard operator<< (const Bitboard& other) const { return Bitboard(board_ << other.board_); }
+        inline Bitboard operator>> (const Bitboard& other) const { return Bitboard(board_ >> other.board_); }
+
+        inline Bitboard& operator&= (const Bitboard& other) { Bitboard(board_ &= other.board_); return *this; }
+        inline Bitboard& operator|= (const Bitboard& other) { Bitboard(board_ |= other.board_); return *this; }
+        inline Bitboard& operator^= (const Bitboard& other) { Bitboard(board_ ^= other.board_); return *this; }
+        inline Bitboard& operator<<= (const Bitboard& other) { Bitboard(board_ <<= other.board_); return *this; }
+        inline Bitboard& operator>>= (const Bitboard& other) { Bitboard(board_ >>= other.board_); return *this; }
 
         inline bool empty() const { return board_ == 0; }
         inline bool operator==(uint64_t rhs) const { return board_ == rhs; }
         inline bool operator!=(uint64_t rhs) const { return board_ != rhs; }
         inline bool operator==(const Bitboard& other) const { return board_ == other.board_; }
         inline bool operator!=(const Bitboard& other) const { return board_ != other.board_; }
+        inline explicit operator bool() const { return !empty(); }
 
         inline friend std::ostream& operator<<(std::ostream& out, const Bitboard& rhs) { utils::printBits(rhs.board_); return out; }
+        inline friend Bitboard operator&(uint64_t other, const Bitboard& rhs) { return other & rhs.board_; }
 
     private:
         uint64_t board_{0};

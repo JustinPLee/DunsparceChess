@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <array>
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -14,11 +15,11 @@ namespace dunsparce::utils {
     }
 
     inline Rank getRank(Square square) {
-        return Rank(square/8);
+        return Rank(square/8+1);
     }
 
     inline File getFile(Square square) {
-        return File(square%8);
+        return File(square%8+1);
     }
 
     inline int getRankShift(Square square) {
@@ -89,5 +90,51 @@ namespace dunsparce::utils {
             bits >>= 1;
         }
         std::cout << (s.empty() ? 0 : s);
+    }
+
+    inline int popcount(Bitboard b) {
+        int count = 0;
+        while(b) {
+            ++count;
+            b >>= 1;
+        }
+        return count;
+    }
+
+    inline Square bitScan(const Bitboard& b) {
+        if (b != 0) {
+            return Square( popcount(b & -b)-1 );
+        }
+        return Square{ NULL_SQUARE };
+    }
+    // lsb
+    inline Square bitScanForward(const Bitboard& b) {
+        // cool algo
+        static const std::array<int, 64> index64 = {
+            0, 47, 1, 56, 48, 27, 2, 60,
+            57, 49, 41, 37, 28, 16, 3, 61,
+            54, 58, 35, 52, 50, 42, 21, 44,
+            38, 32, 29, 23, 17, 11, 4, 62,
+            46, 55, 26, 59, 40, 36, 15, 53,
+            34, 51, 20, 43, 31, 22, 10, 45,
+            25, 39, 14, 33, 19, 30, 9, 24,
+            13, 18, 8, 12, 7, 6, 5, 63
+        };
+        static constexpr StaticBB debruijn64 = 0x03f79d71b4cb0a89;
+        return Square(index64[((b ^ (b - 1)) * debruijn64) >> 58]);
+    }
+
+    inline void clearBit(Bitboard& b, Square square) {
+        b ^= (uint64_t{1} << (N_SQUARES - int{square}));
+    }
+
+    inline void printBB(const Bitboard& b) {
+        for(int i = 0; i < 8; i++){
+        for(int j = 0; j < 8; j++) {
+            const int n = 63-8*i-j;
+            std::cout << ((b >> n) & 1 ? 'x' : '.');
+        }
+        std::cout << '\n';
+        }
     }
 }

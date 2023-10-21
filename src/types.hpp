@@ -8,7 +8,8 @@ namespace dunsparce {
  * Global types
 */
 
-using StaticBB = uint64_t;
+using StaticBB = const uint64_t;
+using Bitboard = uint64_t;
 
 /**
  * Type for identifying a Square. 
@@ -93,7 +94,6 @@ enum Color {
     NULL_COLOR = 0, // review
     N_COLORS = 2,
 };
-Color operator!(Color color) { return Color{!color}; }
 
 /**
  * Piece class is composed of a PieceType and a Color
@@ -116,9 +116,9 @@ struct MoveType {
     Piece piece;
     Piece captured;
     Piece promoted;
-    bool is_double_push;
-    bool is_croissant;
-    bool is_castle;
+    bool isDoublePush;
+    bool isCroissant;
+    bool isCastle;
 };
 
 }

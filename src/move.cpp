@@ -16,9 +16,9 @@ Move::Move(MoveType data) {
             (uint32_t{data.captured.color} << 19) |
             (uint32_t{data.promoted.type}  << 20) |
             (uint32_t{data.promoted.color} << 23) |
-            (uint32_t{data.is_double_push} << 24) |
-            (uint32_t{data.is_croissant}   << 25) |
-            (uint32_t{data.is_castle}      << 26);
+            (uint32_t{data.isDoublePush} << 24) |
+            (uint32_t{data.isCroissant}   << 25) |
+            (uint32_t{data.isCastle}      << 26);
 }
 
 Square Move::getFromSquare() const {
@@ -83,7 +83,7 @@ void Move::setPiece(Piece piece) {
     move_ |= (piece.color << 15);
 }
 
-void Move::setCapturedPiece(Piece piece) {
+void Move::setCapturePiece(Piece piece) {
     // Bits:
     //  Type: 16-18
     //  Color: 19
@@ -93,7 +93,7 @@ void Move::setCapturedPiece(Piece piece) {
     move_ |= (piece.color << 19);
 }
 
-void Move::setPromotedPiece(Piece piece) {
+void Move::setPromotionPiece(Piece piece) {
     // Bits:
     //  Type: 20-22
     //  Color: 23
