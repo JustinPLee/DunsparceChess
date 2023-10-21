@@ -2,43 +2,13 @@
 
 #include <cstdint> // uint types
 
+namespace dunsparce {
+
 /**
  * Global types
 */
 
-/**
- * Types for each piece, including a type for no piece
-*/
-enum PieceType {
-    PAWN,
-    KNIGHT,
-    BISHOP,
-    ROOK,
-    QUEEN,
-    KING,
-    NONE = 6,
-    N_PIECES = 6,
-};
-
-/**
- * Type of color, including a type for no color
-*/
-enum Color {
-    BLACK = 0,
-    WHITE = 1,
-    NULL_COLOR = 0,
-    N_COLORS = 2,
-};
-
-/**
- * Piece class is composed of a PieceType and a Color
-*/
-struct Piece {
-    PieceType type;
-    Color color;
-};
-inline bool operator==(const Piece& lhs, const Piece& rhs) { return lhs.type == rhs.type && lhs.color == rhs.color; }
-inline bool operator!=(const Piece& lhs, const Piece& rhs) { return !(lhs == rhs); }
+using StaticBB = uint64_t;
 
 /**
  * Type for identifying a Square. 
@@ -63,10 +33,10 @@ enum Direction {
     SOUTH = -8,
     WEST = -1,
     EAST = 1,
-    NORTH_WEST = 7,
-    NORTH_EAST = 9,
-    SOUTH_WEST = -9,
-    SOUTH_EAST = -7,
+    NORTH_WEST = NORTH + WEST,
+    NORTH_EAST = NORTH + EAST,
+    SOUTH_WEST = SOUTH + WEST,
+    SOUTH_EAST = SOUTH + EAST,
     N_DIRECTIONS = 8
 };
 
@@ -101,6 +71,43 @@ enum File {
 };
 
 /**
+ * Types for each piece, including a type for no piece
+*/
+enum PieceType {
+    PAWN,
+    KNIGHT,
+    BISHOP,
+    ROOK,
+    QUEEN,
+    KING,
+    NONE = 6,
+    N_PIECES = 6,
+};
+
+/**
+ * Type of color, including a type for no color
+*/
+enum Color {
+    BLACK = 0,
+    WHITE = 1,
+    NULL_COLOR = 0, // review
+    N_COLORS = 2,
+};
+Color operator!(Color color) { return Color{!color}; }
+
+/**
+ * Piece class is composed of a PieceType and a Color
+*/
+struct Piece {
+    PieceType type;
+    Color color;
+    Piece() : type{ PieceType::NONE }, color{ Color::NULL_COLOR } {}
+    Piece(PieceType type, Color color) : type{type}, color{color} {}
+    inline bool operator==(const Piece& rhs) const { return this->type == rhs.type && this->color == rhs.color; }
+    inline bool operator!=(const Piece& rhs) const { return !(*this == rhs); }
+};
+
+/**
  * Type definition for a MoveType. Stored as a 32-bit int.
 */
 struct MoveType {
@@ -113,3 +120,5 @@ struct MoveType {
     bool is_croissant;
     bool is_castle;
 };
+
+}

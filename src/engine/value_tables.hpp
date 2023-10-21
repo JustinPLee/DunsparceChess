@@ -2,6 +2,7 @@
 
 #include <array>
 
+namespace dunsparce {
 /**
  * Piece Tables
  * Basic way of evaluating the favoredness of a piece's location
@@ -85,3 +86,5 @@ constexpr std::array<int, 64> KING_TABLE_END {
     -30,-30,  0,  0,  0,  0,-30,-30,
     -50,-30,-30,-30,-30,-30,-30,-50
 };
+
+}

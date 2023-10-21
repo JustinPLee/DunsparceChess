@@ -5,8 +5,6 @@
 #include <vector>
 #include <functional>
 #include <string>
-#include <charconv>
-#include "assert.h"
 
 #include "../src/types.hpp"
 #include "../src/board.hpp"
@@ -17,7 +15,7 @@
 #include "../src/piece_tables.hpp"
 #include "../src/uci.hpp"
 
-namespace tests {
+namespace dunsparce::tests {
 
 int pray_index = 0;
 struct TestCase {
@@ -147,9 +145,9 @@ void testMoveRepr() {
 }
 
 void testSanity() {
-    std::cout << "Sanity\n";
-    std::cout << "======\n";
-    test("", [](){});
+    std::cout << "Sanity Check\n";
+    std::cout << "============\n";
+    test("^", [](){});
 }
 
 void executeAll() {
@@ -160,20 +158,21 @@ void executeAll() {
         testSanity
     };
     std::cout << "Starting tests...\n\n";
+    int total_tests = 0;
+    int errors = 0;
     for(const auto& test : allTests) {
         // for each test category, populate testCases with its specific test cases
         test();
         for(const auto& test_case : testCases) {
             bool err_found = false;
             if(test_case.description != "") {
-                std::cout << "Test Case: \"" << test_case.description << "\" ";
-            } else {
-                std::cout << "Test Case: " << test_case.description;
+                std::cout << "[Test Case: \"" << test_case.description << "\"] ";
             }
             try {
                 test_case.func();
             } catch (AAAAAAAAAAAAAAAAAA& err) {
-                std::cout << " ❌" << "  Prayer #" << pray_index << " has been denied!\n";
+                std::cout << " ❌" << "  Prayer #" << pray_index << " failed\n";
+                ++errors;
                 err_found = true;
             };
             if(!err_found) {
@@ -181,16 +180,22 @@ void executeAll() {
             }
             pray_index = 0;
         }
+        ++total_tests;
         // empty the test cases vector for the next test category
         testCases.clear();
         std::cout << "\n";
     };
-    std::cout << "🎉🎉🎉 All tests cleared! 🎉🎉🎉\n";
+
+    if(errors == 0 || total_tests == 0) {
+        std::cout << "🎉🎉🎉 All tests cleared! 🎉🎉🎉\n";
+    } else {
+        std::cout << 100.0*(total_tests-errors)/total_tests << "% of tests cleared.\n";
+    }
 }
 
 }
 
 int main() {
-    tests::executeAll();
+    dunsparce::tests::executeAll();
     return 0;
 }

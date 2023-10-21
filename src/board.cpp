@@ -4,41 +4,34 @@
 #include "board.hpp"
 #include "utils.hpp"
 
+namespace dunsparce {
+
 Board::Board(std::string_view fen) {
     init(fen);
 }
 
 void Board::init(std::string_view fen) {
-    initBitboards();
     processFen(fen);
 };
 
-void Board::initBitboards() {
-    // set all piece bitboards to 0
-    for(int color = 0; color < N_COLORS; ++color) {
-        for(int ptype = 0; ptype < N_PIECES; ++ptype) {
-            pieces_[color][ptype] = 0;
-        }
-    }
-    // set each square to a null piece
-    for(int square = 0; square < N_SQUARES; ++square) {
-        squares_[square] = { NONE, NULL_COLOR };
-    }
-
-    // set each color occupancy bitboard to 0
-    colors_[WHITE] = 0;
-    colors_[BLACK] = 0;
-
-}
 
 void Board::clear() {
-    initBitboards();
+    squares_.fill(Piece{}); 
+
+    for(int i = 0; i < N_PIECES; ++i) {
+        for(int c = 0; c < N_COLORS; ++c) {
+            pieces_[i][c] = uint64_t{0};
+        } 
+    }
+
+    occupancies_[WHITE] = Bitboard{0};
+    occupancies_[BLACK] = Bitboard{0};
 
     state_ = BoardState{
         .castling_rights = CASTLE_BLACK_KING | CASTLE_BLACK_QUEEN | CASTLE_WHITE_KING | CASTLE_WHITE_QUEEN, /*all rights set to true by default*/
         .croissant = NULL_SQUARE,
         .half_moves = 0,
-        .zobrist_key = 0
+        .zobrist_key = uint64_t{0}
     };
 
     full_moves_ = 0;
@@ -46,14 +39,15 @@ void Board::clear() {
     pov_ = WHITE;
 }
 
+void Board::updatePieceAndColorBitboards(Piece piece, Square square) {
+    pieces_[piece.color][piece.type].set(square);
+    occupancies_[piece.color].set(square); 
+}
+
 void Board::processFen(std::string_view fen) {
     // Example starting FEN: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0
-
-    Color next_move;
-    int full_moves;
-    BoardState state;
     
-    std::vector<std::string> fields = utils::tokenize(fen.data());
+    std::vector<std::string> fields{ utils::tokenize(fen.data()) };
     // corresponding fields for each section of the FEN string
     enum Fields {
         i_squares = 0,
@@ -64,61 +58,72 @@ void Board::processFen(std::string_view fen) {
         i_full_moves = 5
     };
 
-    // squares
-    std::string_view p = fields[Fields::i_squares];
-    int squareIndex = 0;
-    // If the character is a letter, set the according piece bitboard's
-    // and color occupany bitboard's bit to 1 and add that piece to the
-    // square position array. If the character is a digit, skip that many bits.
-    for(std::size_t i = 0; i < p.length(); ++i) {
-        if(('a' <= p[i] && p[i] <= 'z') || ('A' <= p[i] && p[i] <= 'Z')) {
-            Piece piece = utils::charToPiece(p[i]);
-            squares_[squareIndex] = piece;
-            // set bitboard bit
-            pieces_[piece.color][piece.type] |= (1ULL << squareIndex);
-            colors_[piece.color] |= (1ULL << squareIndex); 
-            squareIndex++;
-        } else if('0' <= p[i] && p[i] <= '9') {
-            squareIndex += p[i] - '0';
-        } else if(p[i] == '/') {
-            continue;
+    const auto get_squares = [&]() {
+        std::string_view p = fields[Fields::i_squares];
+        std::array<Piece, 64> new_squares{};
+        int squareIndex { 0 };
+        // If the character is a letter, set the according piece bitboard's
+        // and color occupany bitboard's bit to 1 and add that piece to the
+        // square position array. If the character is a digit, skip that many bits.
+        for(std::size_t i = 0; i < p.length(); ++i) {
+            if(('a' <= p[i] && p[i] <= 'z') || ('A' <= p[i] && p[i] <= 'Z')) {
+                Piece piece = utils::charToPiece(p[i]);
+                new_squares[squareIndex] = piece;
+                updatePieceAndColorBitboards(piece, Square(squareIndex));
+                squareIndex++;
+            } else if('0' <= p[i] && p[i] <= '9') {
+                squareIndex += p[i] - '0';
+            } else if(p[i] == '/') {
+                continue;
+            }
         }
-    }
+        return new_squares;
+    };
 
-    // nextMove
-    switch(fields[Fields::i_next_move].front()) {
-        case 'w': next_move = WHITE; break;
-        case 'b': next_move = BLACK; break;
-        default: std::cout << "invalid FEN string"; exit(1);
-    }
-
-    // castlingRights;
-    for(auto c: fields[Fields::i_castling_rights]) {
-        switch(c) {
-            case 'k': state.castling_rights |= CASTLE_BLACK_KING;  break;
-            case 'q': state.castling_rights |= CASTLE_BLACK_QUEEN; break;
-            case 'K': state.castling_rights |= CASTLE_WHITE_KING;  break;
-            case 'Q': state.castling_rights |= CASTLE_WHITE_QUEEN; break;
-            case '-': break;
+    const auto get_next_move = [&]() {
+        switch(fields[Fields::i_next_move].front()) {
+            case 'w': return WHITE;
+            case 'b': return BLACK;
             default: std::cout << "invalid FEN string"; exit(1);
         }
-    }
+    };
 
-    // croissant
-    state.croissant = fields[Fields::i_croissant].front() == '-' ? NULL_SQUARE :
-        Square((std::distance(SQUARE_NAMES.begin(), std::find(SQUARE_NAMES.begin(), SQUARE_NAMES.end(), fields[Fields::i_croissant].data()))));
+    const auto get_castling_rights = [&]() {
+        uint8_t castling_rights{};
+        for(auto c: fields[Fields::i_castling_rights]) {
+            switch(c) {
+                case 'k': castling_rights |= CASTLE_BLACK_KING;
+                case 'q': castling_rights |= CASTLE_BLACK_QUEEN;
+                case 'K': castling_rights |= CASTLE_WHITE_KING;
+                case 'Q': castling_rights |= CASTLE_WHITE_QUEEN;
+                case '-': break;
+                default: std::cout << "invalid FEN string"; exit(1);
+            }
+        }
+        return castling_rights;
+    };
 
-    // halfMoves
-    state.half_moves = std::stoi(fields[Fields::i_half_moves].data());
+    const auto get_croissant = [&]() {
+        return fields[Fields::i_croissant].front() == '-' ? NULL_SQUARE :
+            Square((std::distance(SQUARE_NAMES.begin(), std::find(SQUARE_NAMES.begin(), SQUARE_NAMES.end(), fields[Fields::i_croissant].data()))));
+    };
 
-    // fullMoves
-    full_moves = std::stoi(fields[Fields::i_full_moves].data());
+    const auto get_half_moves = [&]() {
+        return std::stoi(fields[Fields::i_half_moves].data());
+    };
 
-    state_ = state;
-    next_move = next_move;
-    full_moves_ = full_moves;
+    const auto get_full_moves = [&]() {
+        return std::stoi(fields[Fields::i_full_moves].data());
+    };
+
+    state_ = { get_castling_rights(), get_croissant(), get_half_moves(), generateZobristKey() };
+    next_move_ = get_next_move();
+    full_moves_ = get_full_moves();
+    squares_ = get_squares();
 }
 
+// TODO: 
+uint64_t Board::generateZobristKey() { return 0; };
 
 // TODO: FIX exporting repeated pieces
 std::string Board::exportFen() {
@@ -222,6 +227,4 @@ void Board::reversePov() {
     pov_ = !pov_;
 }
 
-Piece Board::pieceAt(Square square) {
-    return squares_[square];
 }

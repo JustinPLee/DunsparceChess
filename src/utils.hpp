@@ -7,22 +7,26 @@
 
 #include "types.hpp"
 
-namespace utils {
+namespace dunsparce::utils {
 
     inline Square getSquare(Rank rank, File file) {
         return Square(rank + 8 * file);
     }
 
     inline Rank getRank(Square square) {
-        return Rank(1);
+        return Rank(square/8);
     }
 
     inline File getFile(Square square) {
-        return File(1);
+        return File(square%8);
     }
 
-    inline char pieceToChar(Piece piece) {
-        bool is_black = (piece.color == BLACK);
+    inline int getRankShift(Square square) {
+        return int{getFile(square)}*8+1;
+    }
+    
+    inline char pieceToChar(const Piece& piece) {
+        const bool is_black = (piece.color == BLACK);
         switch(piece.type) {
             case PAWN:   return is_black ? 'p' : 'P';
             case KNIGHT: return is_black ? 'n' : 'N';
@@ -55,7 +59,7 @@ namespace utils {
     }
 
     inline std::string pieceToUnicode(Piece piece) {
-        bool is_black = (piece.color == BLACK);
+        const bool is_black = (piece.color == BLACK);
         switch(piece.type) {
             case PAWN:   return is_black ? "♟︎" : "♙";
             case KNIGHT: return is_black ? "♞" : "♘";
@@ -79,11 +83,11 @@ namespace utils {
     }
 
     inline void printBits(uint64_t bits) {
-        std::string s = "";
+        std::string s{};
         while(bits > 0) {
             s = std::to_string(bits & 1) + s;
             bits >>= 1;
         }
-        std::cout << (s == "" ? 0 : s);
+        std::cout << (s.empty() ? 0 : s);
     }
 }

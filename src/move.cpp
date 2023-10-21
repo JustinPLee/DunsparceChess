@@ -1,6 +1,9 @@
+#include <iostream>
+
 #include "move.hpp"
 #include "types.hpp"
-#include <iostream>
+
+namespace dunsparce {
 
 Move::Move() : move_{uint32_t{0}} {}
 
@@ -30,7 +33,7 @@ Square Move::getToSquare() const {
 
 Piece Move::getPiece() const {
     // Bits:
-    //  Type: 12-14
+    //  Type:  12-14
     //  Color: 15
     return Piece{
         PieceType((move_ >> 12) & 0x7),
@@ -139,4 +142,6 @@ void Move::setIsCastle(bool is_castle) {
     // Bits: 26
     move_ &= ~(1 << 26);
     move_ |= (is_castle << 26);
+}
+
 }
