@@ -1,11 +1,8 @@
 #pragma once
 
-// Utilizes make/unmake
-
-#include "../../types.hpp"
+#include "../../constants.hpp"
 #include "../../board.hpp"
-
-namespace dunsparce {
-    template <Color attacker>
-    bool isAttackedBy(Bitboard targeted, const Board& board);
-}
+#include "../../types.hpp"
+#include "../../utils.hpp"
+#include "tables.hpp"
+#include "attacks.hpp"

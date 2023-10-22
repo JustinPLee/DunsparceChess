@@ -3,94 +3,38 @@
 #include <array>
 
 #include "../../types.hpp"
+#include "../../constants.hpp"
 
 namespace dunsparce::tables {
 
-namespace attacks {
-    std::array<std::array<Bitboard, 64>, 2> PAWN{};
-    std::array<std::array<Bitboard, 64>, 2> KNIGHT{};
-    std::array<std::array<Bitboard, 64>, 2> KING{};
-    std::array<std::array<Bitboard, 64>, 64> RANK{};
-    std::array<std::array<Bitboard, 64>, 64> FILE{};
-    std::array<std::array<Bitboard, 64>, 64> DIAGA8H1{};
-    std::array<std::array<Bitboard, 64>, 64> DIAGA1H8{};
-} // ::attacks
 
-namespace moves {
+namespace dunsparce::tables::relevant_bits { // makes magic generation easier
 
-    std::array<std::array<Bitboard, 64>, 2> PAWN_SINGLE{};
-    std::array<std::array<Bitboard, 64>, 2> PAWN_DOUBLE{};
-
-} // ::moves
-
-namespace magics {
-    constexpr std::array<StaticBB, 8> FILE = {
-        0x8040201008040200,
-        0x4020100804020100,
-        0x2010080402010080,
-        0x1008040201008040,
-        0x0804020100804020,
-        0x0402010080402010,
-        0x0201008040201008,
-        0x0100804020100804
+    inline constexpr std::array<int, N_SQUARES> bishops {
+        6, 5, 5, 5, 5, 5, 5, 6, 
+        5, 5, 5, 5, 5, 5, 5, 5, 
+        5, 5, 7, 7, 7, 7, 5, 5, 
+        5, 5, 7, 9, 9, 7, 5, 5, 
+        5, 5, 7, 9, 9, 7, 5, 5, 
+        5, 5, 7, 7, 7, 7, 5, 5, 
+        5, 5, 5, 5, 5, 5, 5, 5, 
+        6, 5, 5, 5, 5, 5, 5, 6
     };
 
-    constexpr std::array<StaticBB, 15> DIAGA8H1 = {
-        0x0,
-        0x0,
-        0x0101010101010100,
-        0x0101010101010100,
-        0x0101010101010100,
-        0x0101010101010100,
-        0x0101010101010100,
-        0x0101010101010100,
-        0x0080808080808080,
-        0x0040404040404040,
-        0x0020202020202020,
-        0x0010101010101010,
-        0x0008080808080808,
-        0x0,
-        0x0
+    inline constexpr std::array<int, N_SQUARES> rooks {
+        12, 11, 11, 11, 11, 11, 11, 12, 
+        11, 10, 10, 10, 10, 10, 10, 11, 
+        11, 10, 10, 10, 10, 10, 10, 11, 
+        11, 10, 10, 10, 10, 10, 10, 11, 
+        11, 10, 10, 10, 10, 10, 10, 11, 
+        11, 10, 10, 10, 10, 10, 10, 11, 
+        11, 10, 10, 10, 10, 10, 10, 11, 
+        12, 11, 11, 11, 11, 11, 11, 12
     };
 
-    constexpr std::array<StaticBB, 15> DIAGA1H8 = {
-        0x0,
-        0x0,
-        0x0101010101010100,
-        0x0101010101010100,
-        0x0101010101010100,
-        0x0101010101010100,
-        0x0101010101010100,
-        0x0101010101010100,
-        0x8080808080808000,
-        0x4040404040400000,
-        0x2020202020000000,
-        0x1010101000000000,
-        0x0808080000000000,
-        0x0,
-        0x0
-    };
 
-} // ::magics
 
-namespace masks {
+} // dunsparce::tables::occupancies
 
-    std::array<Bitboard, 64> RANK{};
-    std::array<Bitboard, 64> FILE{};
-    std::array<Bitboard, 64> FILE_MAGIC{};
-    std::array<Bitboard, 64> DIAGA8H1{};
-    std::array<Bitboard, 64> DIAGA8H1_MAGIC{};
-    std::array<Bitboard, 64> DIAGA1H8{};
-    std::array<Bitboard, 64> DIAGA1H8_MAGIC{};
-    
-    // used for castling
-    std::array<Bitboard, 2> EG{};
-    std::array<Bitboard, 2> FG{};
-    std::array<Bitboard, 2> BD{};
-    std::array<Bitboard, 2> CE{};
 
-} // ::masks
-
-std::array<std::array<uint8_t, 64>, 8> SLIDING_ATTACKS{}; // !!
-
-} // dunsparce::tables::
+} // dunsparce::tables
