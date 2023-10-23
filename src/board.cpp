@@ -1,24 +1,24 @@
 #include <iostream>
+
 #include "types.hpp"
 #include "constants.hpp"
 #include "board.hpp"
 #include "utils.hpp"
 #include "engine/movegen/attacks.hpp"
+#include "engine/movegen/movegen.hpp"
 
 namespace dunsparce {
 
-Board::Board(std::string_view fen) {
-    init(fen);
+Board::Board(const std::string& fen) {
+    clear();
+    parseFen(fen);
 }
-
-void Board::init(std::string_view fen) {
-    //processFen(fen)
-};
 
 void Board::clear() {
     // state variables
     pieces_.fill(Zero);
     occupancies_.fill(Zero);
+    move_list_.reserve(constants::max_moves);
     croissant_ = NullSquare;
     side_ = White;
     pov_ = White;
@@ -183,6 +183,45 @@ int Board::getPieceMaterial() {
 
 void Board::reversePov() {
     pov_ = (pov_ == White ? Black : White);
+}
+
+int Board::addMove(const move::Move& move) {
+    move_list_.push_back(move);
+    return move_list_.size()-1;
+}
+
+int Board::addMove(Square from_square, Square to_square, Piece piece, Piece promoted_piece, bool capture_flag, bool double_push_flag, bool croissant_flag, bool castling_flag) {
+    move_list_.emplace_back(from_square, to_square, piece, promoted_piece, capture_flag, double_push_flag, croissant_flag, castling_flag);
+    return move_list_.size()-1;
+}
+
+void Board::printMove(int index) const {
+    using namespace utils;
+    using namespace move;
+    std::cout << "Move #" << index << " (";
+    std::cout << "From: " << squareToCoordinates(getFromSquare(move_list_[index])) << ", "
+              << "To: " << squareToCoordinates(getToSquare(move_list_[index])) << ", "
+              << "Piece: " << pieceToChar(getPiece(move_list_[index])) << ", "
+              << "Promoted piece: " << pieceToChar(getPromotedPiece(move_list_[index])) << ", "
+              << "Capture: " << (getCaptureFlag(move_list_[index]) ? 'T' : 'F') << ", "
+              << "Double push: " << (getDoublePushFlag(move_list_[index]) ? 'T' : 'F') << ", "
+              << "Croissant: " << (getCroissantFlag(move_list_[index]) ? 'T' : 'F') << ", "
+              << "Castle: " << (getCastlingFlag(move_list_[index]) ? 'T' : 'F') << ")\n";
+}
+
+void Board::printMoves() const {
+    for(size_t i = 0; i < move_list_.size(); ++i) {
+        printMove(i);
+    }
+}
+
+void Board::generateAllMoves() {
+    movegen::generatePseudoLegalPawnMoves(side_, *this);
+    movegen::generatePseudoLegalKnightMoves(side_, *this);
+    movegen::generatePseudoLegalBishopMoves(side_, *this);
+    movegen::generatePseudoLegalRookMoves(side_, *this);
+    movegen::generatePseudoLegalQueenMoves(side_, *this);
+    movegen::generatePseudoLegalKingMoves(side_, *this);
 }
 
 } // namespace dunsparce

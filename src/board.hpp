@@ -1,10 +1,12 @@
 #pragma once
 
 #include <array>
+#include <vector>
 #include <string_view>
 
 #include "types.hpp"
 #include "constants.hpp"
+#include "move.hpp"
 
 namespace dunsparce {
 /**
@@ -12,16 +14,9 @@ namespace dunsparce {
 */
 class Board {
     public:
-        explicit Board(std::string_view fen = constants::fens::starting);
+        explicit Board(const std::string& fen = constants::fens::starting);
         // defaults for essential board information
         // copied and modiified in move gen and eval
-
-        /**
-         * Clears board and calls processFen.
-         * @param `std::string_view` Valid FEN string
-         * @note Called on `Board`'s construction
-        */
-        void init(std::string_view fen);
 
         /**
          * Parses a given FEN string.
@@ -60,11 +55,19 @@ class Board {
         */
         void clear();
 
+        // returns index of added move
+        int addMove(const move::Move& move);
+        int addMove(Square from_square, Square to_square, Piece piece, Piece promoted_piece, bool capture_flag, bool double_push_flag, bool croissant_flag, bool castling_flag);
+        void printMoves() const;
+        void printMove(int index) const;
+
+        void generateAllMoves();
+
         uint64_t generateZobristKey();
 
-        std::array<Bitboard, 12> pieces_;
-        std::array<Bitboard, 3> occupancies_;
-
+        std::array<Bitboard, NPieces> pieces_;
+        std::array<Bitboard, NColors> occupancies_;
+        std::vector<move::Move> move_list_;
         Color side_;
         Square croissant_;
         uint8_t castling_;

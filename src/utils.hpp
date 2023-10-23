@@ -16,9 +16,7 @@ Square convertToSquare(Rank rank, File file);
 Rank getRank(Square square);
 File getFile(Square square);
 
-int getRankShift(Square square);
-
-char pieceToChar(const Piece& piece);
+char pieceToChar(Piece piece);
 Piece charToPiece(char c);
 std::string pieceToUnicode(Piece piece);
 std::string_view squareToCoordinates(Square square);
@@ -37,8 +35,6 @@ Square getFirstSquare(const Bitboard& bb);
 
 void popSquare(Bitboard& bb, int square);
 
-Bitboard squareToBB(Square square);
-
 void printBB(const Bitboard& bb);
 
 Bitboard shiftRel(Bitboard bb, int val, Color color);
@@ -46,5 +42,7 @@ Bitboard shiftRel(Bitboard bb, int val, Color color);
 Color oppSide(Color color);
 
 bool isSquareEmpty(const Bitboard& bb, Square square);
+
+Piece createPiece(Color color, BasePiece base_piece);
 
 } // namespace dunsparce::utils

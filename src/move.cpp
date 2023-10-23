@@ -1,13 +1,13 @@
 #include "types.hpp"
 #include "move.hpp"
-
+#include "utils.hpp"
 namespace dunsparce::move {
 
 Move::Move(Square from_square, Square to_square, Piece piece, Piece promoted_piece, bool capture_flag, bool double_push_flag, bool croissant_flag, bool castling_flag)
     : move{ 
-        (from_square)              |
+        (uint32_t{from_square})    |
         (to_square          << 6)  |
-        (piece              << 12)    |
+        (piece              << 12) |
         (promoted_piece     << 16) |
         (capture_flag       << 20) |
         (double_push_flag   << 21) |

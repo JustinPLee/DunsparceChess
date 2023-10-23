@@ -221,14 +221,11 @@ Bitboard getQueenAttacks(Square square, const Bitboard& occupancy_bb) {
 
 void initLeapersAttacks() {
     for(int i = 0; i < NSquares; ++i) {
-        // pawns
         pawns[White][i] = generatePawnAttacks(Square(i), White);
         pawns[Black][i] = generatePawnAttacks(Square(i), Black);
         
-        // knights
         knights[i] = generateKnightAttacks(Square(i));
 
-        // kings
         kings[i] = generateKingAttacks(Square(i));
     }
 }
@@ -258,7 +255,7 @@ void initSlidersAttacks(BishopOrRook p_type) {
     }
 }
 
-bool isSquareAttacked(Square square, Color side, std::array<Bitboard, 12> pieces, std::array<Bitboard, 3> occupancies) {
+bool isSquareAttacked(Square square, Color side, const std::array<Bitboard, NPieces>& pieces, const Bitboard& occupancy_bb) {
     // attacked by pawn
     if((side == White) && (attacks::pawns[Black][square] & pieces[WPawn])) return true;
     if((side == Black) && (attacks::pawns[White][square] & pieces[BPawn])) return true;
@@ -270,13 +267,13 @@ bool isSquareAttacked(Square square, Color side, std::array<Bitboard, 12> pieces
     if(attacks::kings[square] & (side == White ? pieces[WKing] : pieces[BKing])) return true;
 
     // attacked by bishop
-    if(attacks::getBishopAttacks(square, occupancies[Both]) & (side == White ? pieces[WBishop] : pieces[BBishop])) return true;
+    if(attacks::getBishopAttacks(square, occupancy_bb) & (side == White ? pieces[WBishop] : pieces[BBishop])) return true;
 
     // attacked by rook
-    if(attacks::getRookAttacks(square, occupancies[Both]) & (side == White ? pieces[WRook] : pieces[BRook])) return true;
+    if(attacks::getRookAttacks(square, occupancy_bb) & (side == White ? pieces[WRook] : pieces[BRook])) return true;
 
     // attacked by queen
-    if(attacks::getQueenAttacks(square, occupancies[Both]) & (side == White ? pieces[WQueen] : pieces[BQueen])) return true;
+    if(attacks::getQueenAttacks(square, occupancy_bb) & (side == White ? pieces[WQueen] : pieces[BQueen])) return true;
 
     return false;
 }

@@ -4,7 +4,6 @@
 
 #include "../../types.hpp"
 #include "../../constants.hpp"
-#include "../../utils.hpp"
 
 namespace dunsparce::attacks {
 
@@ -34,7 +33,7 @@ Bitboard getBishopAttacks(Square square, Bitboard occupancy_bb);
 Bitboard getRookAttacks(Square square, Bitboard occupancy_bb);
 Bitboard getQueenAttacks(Square square, const Bitboard& occupancy_bb);
 
-bool isSquareAttacked(Square square, Color side);
+bool isSquareAttacked(Square square, Color side, const std::array<Bitboard, NPieces>& pieces, const Bitboard& occupancy_bb);
 
 void initLeapersAttacks();
 void initSlidersAttacks(BishopOrRook p_type);

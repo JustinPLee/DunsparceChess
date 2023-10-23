@@ -50,6 +50,16 @@ enum Direction {
 /**
  * Types for each piece
 */
+
+enum BasePiece {
+    BasePawn,
+    BaseKnight,
+    BaseBishop,
+    BaseRook,
+    BaseQueen,
+    BaseKing
+};
+
 enum Piece {
     BPawn,
     BKnight,

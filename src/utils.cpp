@@ -15,7 +15,7 @@
 namespace dunsparce::utils {
 
 char pieceToChar(Piece piece) {
-    static const std::array<char, 13> names{"PNBRQKpnbrqk"};
+    static const std::array<char, NPieces+2> names{"PNBRQKpnbrqk-"};
     return names[int(piece)];
 }
 
@@ -33,17 +33,18 @@ Piece charToPiece(char c) {
         case 'r': return BRook;
         case 'q': return BQueen;
         case 'k': return BKing;
+        case '-': return NullPiece;
         default: std::cout << "invalid char"; exit(1);
     }
 }
 
 std::string pieceToUnicode(Piece piece) {
-    static const std::array<std::string, 12> unicode_chars{"♙","♘","♗","♖","♕","♔","♟︎","♞","♝","♜","♛","♚"};
+    static const std::array<std::string, NPieces+1> unicode_chars{"♙","♘","♗","♖","♕","♔","♟︎","♞","♝","♜","♛","♚", "-"};
     return unicode_chars[int(piece)];
 }
 
 std::string_view squareToCoordinates(Square square) {
-    constexpr static std::array<std::string_view, 64> square_names {
+    constexpr static std::array<std::string_view, NSquares+1> square_names {
         "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
         "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
         "a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6",
@@ -51,7 +52,8 @@ std::string_view squareToCoordinates(Square square) {
         "a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4",
         "a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3",
         "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
-        "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1"
+        "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1",
+        "-"
     };
     return square_names[square];
 }
@@ -150,6 +152,10 @@ Color oppSide(Color color) {
     } else {
         return White;
     }
+}
+
+Piece createPiece(Color color, BasePiece base_piece) {
+    return Piece(base_piece + 6 * static_cast<int>(color));
 }
 
 bool isSquareEmpty(const Bitboard& bb, Square square) {

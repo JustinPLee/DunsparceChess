@@ -11,13 +11,13 @@
 namespace dunsparce::movegen {
 
 // store pawn pushes in lookup table (?)
-void generatePseudoLegalPawnMoves(Color side, const Board& board) {
+void generatePseudoLegalPawnMoves(Color side, Board& board) {
     const Color opp_side{ utils::oppSide(side) };
     const File promotion_file = (side == White ? 7 : 1);
     const File double_push_file = (side == White ? 2 : 6);
     const int rel_move_offset = (side == White ? -8 : 8);
-    // create a copy so the original bitboard is not destroyed
-    Bitboard pawn_bb = (side == White ? board.pieces_[WPawn] : board.pieces_[BPawn]);
+    Piece piece{ utils::createPiece(side, BasePawn) };
+    Bitboard pawn_bb{ board.pieces_[piece] };
     Square from_square, to_square;
 
     // exhaust every pawn in the bitboard
@@ -29,7 +29,10 @@ void generatePseudoLegalPawnMoves(Color side, const Board& board) {
         if((to_square >= A8 && to_square <= H1) && utils::isSquareEmpty(board.occupancies_[Both], to_square)) {
             // promotion
             if(utils::getFile(from_square) == promotion_file) {
-
+                board.addMove(from_square, to_square, piece, utils::createPiece(opp_side, BaseQueen), false, false, false, false);
+                board.addMove(from_square, to_square, piece, BQueen, false, false, false, false);
+                board.addMove(from_square, to_square, piece, BQueen, false, false, false, false);
+                board.addMove(from_square, to_square, piece, BQueen, false, false, false, false);
             } else {
                 // single push
 
@@ -60,7 +63,7 @@ void generatePseudoLegalPawnMoves(Color side, const Board& board) {
     }
 }
 
-void generatePseudoLegalKnightMoves(Color side, const Board& board) {
+void generatePseudoLegalKnightMoves(Color side, Board& board) {
     const Color oppSide{ utils::oppSide(side) };
     Bitboard knight_bb = (side == White ? board.pieces_[WKnight] : board.pieces_[BKnight]);
     while(knight_bb) {
@@ -83,7 +86,7 @@ void generatePseudoLegalKnightMoves(Color side, const Board& board) {
     }
 }
 
-void generatePseudoLegalBishopMoves(Color side, const Board& board) {
+void generatePseudoLegalBishopMoves(Color side, Board& board) {
     const Color oppSide{ utils::oppSide(side) };
     Bitboard bishop_bb = (side == White ? board.pieces_[WBishop] : board.pieces_[BBishop]);
     while(bishop_bb) {
@@ -106,7 +109,7 @@ void generatePseudoLegalBishopMoves(Color side, const Board& board) {
     }
 }
 
-void generatePseudoLegalRookMoves(Color side, const Board& board) {
+void generatePseudoLegalRookMoves(Color side, Board& board) {
     const Color oppSide{ utils::oppSide(side) };
     Bitboard rook_bb = (side == White ? board.pieces_[WRook] : board.pieces_[BRook]);
     while(rook_bb) {
@@ -129,7 +132,7 @@ void generatePseudoLegalRookMoves(Color side, const Board& board) {
     }
 }
 
-void generatePseudoLegalQueenMoves(Color side, const Board& board) {
+void generatePseudoLegalQueenMoves(Color side, Board& board) {
     const Color oppSide{ utils::oppSide(side) };
     Bitboard queen_bb = (side == White ? board.pieces_[WQueen] : board.pieces_[BQueen]);
     while(queen_bb) {
@@ -152,11 +155,9 @@ void generatePseudoLegalQueenMoves(Color side, const Board& board) {
     }
 }
 
-void generatePseudoLegalKingMoves(Color side, const Board& board) {
+void generatePseudoLegalKingMoves(Color side, Board& board) {
     const Color oppSide{ utils::oppSide(side) };
     Bitboard king_bb = (side == White ? board.pieces_[WKing] : board.pieces_[BKing]);
-    Square from_square, to_square;
-
     while(king_bb) {
         const Square from_square{ utils::getFirstSquare(king_bb) };
         Bitboard attack_bb{ attacks::kings[from_square] & board.occupancies_[oppSide] };
@@ -179,14 +180,14 @@ void generatePseudoLegalKingMoves(Color side, const Board& board) {
     if(side == White) {
         if(board.castling_ & constants::castle_wk) {
             if(utils::isSquareEmpty(board.occupancies_[Both], F1) && utils::isSquareEmpty(board.occupancies_[Both], G1)) {
-                if(!attacks::isSquareAttacked(E1, Black) && !attacks::isSquareAttacked(F1, Black)) {
+                if(!attacks::isSquareAttacked(E1, Black, board.pieces_, board.occupancies_[Both]) && !attacks::isSquareAttacked(F1, Black, board.pieces_, board.occupancies_[Both])) {
 
                 }
             }
         }
         if(board.castling_ & constants::castle_wq) {
             if(utils::isSquareEmpty(board.occupancies_[Both], D1) && utils::isSquareEmpty(board.occupancies_[Both], C1) && utils::isSquareEmpty(board.occupancies_[Both], B1)) {
-                if(!attacks::isSquareAttacked(E1, Black) && !attacks::isSquareAttacked(D1, Black)) {
+                if(!attacks::isSquareAttacked(E1, Black, board.pieces_, board.occupancies_[Both]) && !attacks::isSquareAttacked(D1, Black, board.pieces_, board.occupancies_[Both])) {
                     
                 }
             }
@@ -194,14 +195,14 @@ void generatePseudoLegalKingMoves(Color side, const Board& board) {
     } else {
         if(board.castling_ & constants::castle_bk) {
             if(utils::isSquareEmpty(board.occupancies_[Both], F8) && utils::isSquareEmpty(board.occupancies_[Both], G8)) {
-                if(!attacks::isSquareAttacked(E8, White) && !attacks::isSquareAttacked(F8, White)) {
+                if(!attacks::isSquareAttacked(E8, White, board.pieces_, board.occupancies_[Both]) && !attacks::isSquareAttacked(F8, White, board.pieces_, board.occupancies_[Both])) {
                     
                 }
             }
         }
         if(board.castling_ & constants::castle_bq) {
             if(utils::isSquareEmpty(board.occupancies_[Both], D8) && utils::isSquareEmpty(board.occupancies_[Both], C8) && utils::isSquareEmpty(board.occupancies_[Both], B8)) {
-                if(!attacks::isSquareAttacked(E8, White) && !attacks::isSquareAttacked(D8, White)) {
+                if(!attacks::isSquareAttacked(E8, White, board.pieces_, board.occupancies_[Both]) && !attacks::isSquareAttacked(D8, White, board.pieces_, board.occupancies_[Both])) {
                     
                 }
             }
