@@ -104,10 +104,13 @@ namespace dunsparce::utils {
         bb |= squareToBB(square);
     }
 
-    // returns 64 if bitboard is empty
     // lsb (from topleft)
     Square getFirstSquare(const Bitboard& bb) {
-        return Square(std::countr_zero(bb));
+        if (bb) {
+            return Square(popcount((bb & -bb) - 1));
+        } else {
+            return NULL_SQUARE;
+        }
     }
 
     Bitboard squareToBB(Square square) {

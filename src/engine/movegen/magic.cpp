@@ -14,8 +14,8 @@ namespace dunsparce::magic {
 
     void init() {
         for(int i = 0; i < N_SQUARES; ++i) {
-            std::cout << (hash(Square(i), tables::relevant_bits::rooks[i], ROOK)) << "ULL,\n";
-            std::cout << (hash(Square(i), tables::relevant_bits::bishops[i], BISHOP)) << "ULL,\n";
+            // printf(" 0x%llxULL\n", getMagicHash(Square(i), tables::relevant_bits::rooks[i], ROOK));
+            // printf(" 0x%llxULL\n", getMagicHash(Square(i), tables::relevant_bits::bishops[i], BISHOP));
         }
     }
 
@@ -29,26 +29,24 @@ namespace dunsparce::magic {
 
             // store first square
             const Square square{ utils::getFirstSquare(attack_bb) };
-            
-            // only set bits under the index mask
-            if(index & (ONE << nth_bit)) {
-                utils::setSquare(occupancy_bb, square);
-            }
 
             // remove square from remaining list of possible squares
             utils::popSquare(attack_bb, square);
+            
+            // only set bits under the index mask
+            if(index & (1 << nth_bit)) {
+                utils::setSquare(occupancy_bb, square);
+            }
         }
         
         return occupancy_bb;
     }
 
     uint32_t reseed() {
-
         // xor shift randomizer
         seed ^= (seed << 13);
         seed ^= (seed >> 17);
         seed ^= (seed << 5);
-
         return seed;
     }
 
@@ -70,13 +68,11 @@ namespace dunsparce::magic {
         return randMagicNumber() & randMagicNumber() & randMagicNumber() & randMagicNumber();
     }
 
-    Bitboard hash(Square source, int relevant_bits, PieceType p_type) {   
-
+    Bitboard getMagicHash(Square source, int relevant_bits, PieceType p_type) {   
         /*  the max number of relevant bits is 12
             2^12 is 4096, covering all permutations
             (remember: ideally one time cost)   */
 
-        //
         std::array<Bitboard, 4096> occupancy_tables{ ZERO };
         
         std::array<Bitboard, 4096> attack_tables{ ZERO };
@@ -90,31 +86,27 @@ namespace dunsparce::magic {
         int num_permutations{ 1 << relevant_bits };
         
         for(int p_idx = 0; p_idx < num_permutations; ++p_idx) {
-            
             // populate occupancy tables with all possible attacks
             occupancy_tables[p_idx] = generateAttackPermutation(p_idx, relevant_bits, attack_bb);
 
             // populate proper attack tables with blocked attacks using occupancy tables
             // i do this to generate a properly formed ray, for example this sequence of bits for a rook is invalid: 00011001
             attack_tables[p_idx] = (p_type == BISHOP) ? attacks::generateBishopAttacksWithBlockers(source, occupancy_tables[p_idx]) : attacks::generateRookAttacksWithBlockers(source, occupancy_tables[p_idx]);
-        
         }
 
         // loop a bunch of times to find a valid magic hash
         // (this should very rarely fail)
         for(int i = 0; i < 1000000000; ++i) {
-            
             // randomly populated bitboard
             Bitboard magic_num{ generateMagicNumber() };
             
             // skip if too few bits
-            if(utils::popcount((attack_bb * magic_num & 0xFF00000000000000) < 6)) continue;
+            if(utils::popcount((attack_bb * magic_num) & 0xFF00000000000000) < 6) continue;
 
             bool fail{ false };
 
             // loop over every permutation
             for(int index = 0; index < num_permutations; ++index) {
-                
                 // plug in candidate magic_num into known formula
                 int magic_index{ static_cast<int>((occupancy_tables[index] * magic_num) >> (64 - relevant_bits)) };
                 
@@ -122,22 +114,15 @@ namespace dunsparce::magic {
                 // store seen positions in used_attack_tables
                 // if the tables do not match, the magic number is invalid
                 if(used_attack_tables[magic_index] == ZERO) {
-
                     used_attack_tables[magic_index] = attack_tables[magic_index];
-
                 } else if(used_attack_tables[magic_index] != attack_tables[magic_index]) {
-
                     fail = true;
                     break;
-
                 }
-
             }
-
             if(fail == false) {
                 return magic_num;
             }
-
         }
         // no magic num found
         std::cout << "ERROR!";

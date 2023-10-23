@@ -34,7 +34,7 @@ namespace dunsparce::magic {
     /**
      * Computes the magic hash of either a bishop or rook
     */
-    Bitboard hash(Square source, int relevant_bits, PieceType p_type);
+    Bitboard getMagicHash(Square source, int relevant_bits, PieceType p_type);
 
     // Called once in the creation process of the engine.
     // Currently not meant to be called during runtime.

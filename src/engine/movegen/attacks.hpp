@@ -7,10 +7,15 @@
 #include "../../utils.hpp"
 
 namespace dunsparce::attacks {
-
     inline std::array<std::array<Bitboard, N_COLORS>, N_SQUARES> pawns; // pawns can only move in one direction
     inline std::array<Bitboard, N_SQUARES> knights;
     inline std::array<Bitboard, N_SQUARES> kings;
+
+    // sliders
+    inline std::array<Bitboard, N_SQUARES> bishops_all;
+    inline std::array<Bitboard, N_SQUARES> rooks_all;
+    inline std::array<std::array<Bitboard, N_SQUARES>, 512> bishops;
+    inline std::array<std::array<Bitboard, N_SQUARES>, 4096> rooks;
 
     template <Color to_move>
     inline Bitboard generatePawnAttacks(Square source) {
@@ -35,6 +40,9 @@ namespace dunsparce::attacks {
 
     Bitboard generateRookAttacksWithBlockers(Square source, const Bitboard& occupany_bb);
 
-    void initLeapersAttacks();
+    Bitboard generateBishopMagicAttacks(Square square, Bitboard occupancy_bb);
+    Bitboard generateRookMagicAttacks(Square square, Bitboard occupancy_bb);
 
+    void initLeapersAttacks();
+    void initSlidersAttacks(PieceType p_type);
 } // namespace dunsparce::attacks

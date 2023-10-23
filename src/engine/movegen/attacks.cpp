@@ -2,6 +2,8 @@
 #include "../../utils.hpp"
 #include "../../constants.hpp"
 #include "../../types.hpp"
+#include "magic.hpp"
+#include "tables.hpp"
 namespace dunsparce::attacks {
 
     [[nodiscard]] Bitboard generateKnightAttacks(Square source) {
@@ -187,6 +189,21 @@ namespace dunsparce::attacks {
         return attack_bb;
     }
 
+    Bitboard generateBishopMagicAttacks(Square square, Bitboard occupancy_bb) {
+        occupancy_bb &= bishops_all[square];
+        occupancy_bb *= tables::magics::bishops[square];
+        occupancy_bb >>= (64 - tables::relevant_bits::bishops[square]);
+        return attacks::bishops[square][occupancy_bb];
+    }
+
+    Bitboard generateRookMagicAttacks(Square square, Bitboard occupancy_bb) {
+        occupancy_bb &= rooks_all[square];
+        occupancy_bb *= tables::magics::rooks[square];
+        occupancy_bb >>= (64 - tables::relevant_bits::rooks[square]);
+        return attacks::rooks[square][occupancy_bb];
+    }
+
+
     void initLeapersAttacks() {
         for(int i = 0; i < N_SQUARES; ++i) {
             // pawns
@@ -198,6 +215,31 @@ namespace dunsparce::attacks {
 
             // kings
             kings[i] = generateKingAttacks(Square(i));
+        }
+    }
+
+    void initSlidersAttacks(PieceType p_type) {
+        for(int i = 0; i < N_SQUARES; ++i) {
+            //if(p_type == BISHOP) {
+                bishops_all[i] = generateBishopAttacksNoBlockers(Square(i));
+            //} else {
+                rooks_all[i] = generateRookAttacksNoBlockers(Square(i));
+            //}
+
+            Bitboard attack_bb = (p_type == BISHOP) ? bishops_all[i] : rooks_all[i];
+            int relevant_bits = utils::popcount(attack_bb);
+            int num_permutations{ 1 << relevant_bits };
+            for(int p_idx = 0; p_idx < num_permutations; ++p_idx) {
+                if(p_type == BISHOP) {
+                    Bitboard permutation_bb{ magic::generateAttackPermutation(p_idx, relevant_bits, attack_bb) };
+                    int magic_index{ static_cast<int>((permutation_bb * tables::magics::bishops[i]) >> (64 - tables::relevant_bits::bishops[i])) };
+                    attacks::bishops[i][magic_index] = generateBishopAttacksWithBlockers(Square(i), permutation_bb);
+                } else {
+                    Bitboard permutation_bb{ magic::generateAttackPermutation(p_idx, relevant_bits, attack_bb) };
+                    int magic_index{ static_cast<int>((permutation_bb * tables::magics::rooks[i]) >> (64 - tables::relevant_bits::rooks[i])) };
+                    attacks::rooks[i][magic_index] = generateRookAttacksWithBlockers(Square(i), permutation_bb);
+                }
+            }
         }
     }
 }
