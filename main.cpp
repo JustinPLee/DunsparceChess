@@ -7,18 +7,14 @@
 #include "src/constants.hpp"
 #include "src/utils.hpp"
 #include "src/engine/movegen/attacks.hpp"
+#include "src/engine/movegen/magic.hpp"
 
 int main() {
+    initAll();
+    return 0;
+}
+
+void initAll() {
     using namespace dunsparce;
     attacks::initLeapersAttacks();
-
-    for(int rank = 0; rank < 8; ++rank) {
-        for(int file = 0; file < 8; ++file) {
-            int square = rank * 8 + file;
-            std::cout << utils::popcount(attacks::generateRookAttacksNoBlockers(Square(square))) << ", ";
-        }
-        std::cout << '\n';
-    }
-
-    return 0;
 }

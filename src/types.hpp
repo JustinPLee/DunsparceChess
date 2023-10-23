@@ -9,9 +9,10 @@ namespace dunsparce {
  * Global types
 */
 
-using StaticBB = const uint64_t;
-using U64Mask = const uint64_t;
 using Bitboard = uint64_t;
+using Rank = int;
+using File = int;
+
 
 /**
  * Type for identifying a Square. 
@@ -28,6 +29,7 @@ enum Square {
     N_SQUARES = 64, NULL_SQUARE = 65
 };
 
+
 /**
  * Type for abs Direction
 */
@@ -43,36 +45,6 @@ enum Direction {
     N_DIRECTIONS = 8
 };
 
-
-/**
- * Type for a Rank.
-*/
-enum Rank {
-    RANK1 = 0,
-    RANK2,
-    RANK3,
-    RANK4,
-    RANK5,
-    RANK6,
-    RANK7,
-    RANK8,
-    N_RANKS = 8
-};
-
-/**
- * Type for a File.
-*/
-enum File {
-    FILEA = 0,
-    FILEB,
-    FILEC,
-    FILED,
-    FILEE,
-    FILEF,
-    FILEG,
-    FILEH,
-    N_FILES = 8
-};
 
 /**
  * Types for each piece, including a type for no piece
@@ -137,4 +109,4 @@ inline std::ostream& operator<<(std::ostream& out, const MoveType& move_type) {
     return out;
 }
 
-}
+} // dunsparce::types

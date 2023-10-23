@@ -11,8 +11,7 @@
 #include "constants.hpp"
 namespace dunsparce::utils {
 
-    Square getSquare(Rank rank, File file);
-    Square getSquare(File file, Rank rank);
+    Square convertToSquare(Rank rank, File file);
 
     Rank getRank(Square square);
     File getFile(Square square);
@@ -30,13 +29,13 @@ namespace dunsparce::utils {
 
     int popcount(uint64_t b);
 
-    bool getBit(const uint64_t& b, Square square);
-    void setBit(uint64_t& b, Square square);
+    bool getSquare(const uint64_t& b, Square square);
+    void setSquare(uint64_t& b, Square square);
     // lsb
     // returns 64 if bitboard is empty
-    int getLSBIndex(const Bitboard& b);
+    Square getFirstSquare(const Bitboard& b);
 
-    void popBit(uint64_t& b, int square);
+    void popSquare(uint64_t& b, int square);
 
     Bitboard squareToBB(Square square);
 
@@ -51,4 +50,5 @@ namespace dunsparce::utils {
         }
         return bb;
     }
+
 }

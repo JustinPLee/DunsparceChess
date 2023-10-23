@@ -5,6 +5,7 @@
 #include <sstream>
 #include <bit>
 #include <iostream>
+#include "assert.h"
 
 #include "utils.hpp"
 
@@ -13,26 +14,6 @@
 
 namespace dunsparce::utils {
 
-    Square getSquare(Rank rank, File file) {
-        return Square(rank + 8 * file);
-    }
-
-    Square getSquare(File file, Rank rank) {
-        return Square(rank + 8 * file);
-    }
-
-    Rank getRank(Square square) {
-        return Rank(square/8+1);
-    }
-
-    File getFile(Square square) {
-        return File(square%8+1);
-    }
-
-    int getRankShift(Square square) {
-        return int{getFile(square)}*8+1;
-    }
-    
     char pieceToChar(const Piece& piece) {
         const bool is_black = (piece.color == BLACK);
         switch(piece.type) {
@@ -94,60 +75,78 @@ namespace dunsparce::utils {
         return tokens;
     }
 
-    void printBits(uint64_t bits) {
-        if(bits == 0) {
+    void printBits(Bitboard bb) {
+        if(bb == 0) {
             std::cout << 0;
             return;
         }
         std::string bit_s{};
         for(int i = 0; i < 64; ++i) {
-            bit_s = std::to_string(bits&1) + bit_s;
-            bits >>= 1;
+            bit_s = std::to_string(bb & 1) + bit_s;
+            bb >>= 1;
         }
         std::cout << bit_s;
     }
 
-    int popcount(uint64_t b) {
+    int popcount(Bitboard bb) {
         int count = 0;
-        while(b) {
+        while(bb) {
             ++count;
-            b &= b - 1;
+            bb &= bb - 1;
         }
         return count;
     }
 
-    bool getBit(const uint64_t& b, Square square) {
-        return b & (uint64_t{1} << square);
+    bool getSquare(const Bitboard& bb, Square square) {
+        return bb & squareToBB(square);
     }
-    void setBit(uint64_t& b, Square square) {
-        b |= (uint64_t{1} << square);
+    void setSquare(Bitboard& bb, Square square) {
+        bb |= squareToBB(square);
     }
-    // lsb
+
     // returns 64 if bitboard is empty
-    int getLSBIndex(const Bitboard& b) {
-        return std::countr_zero(b);
+    // lsb (from topleft)
+    Square getFirstSquare(const Bitboard& bb) {
+        return Square(std::countr_zero(bb));
     }
 
     Bitboard squareToBB(Square square) {
-        return Bitboard(uint64_t{1} << square);
+        return Bitboard(ONE << square);
     }
 
-    void popBit(uint64_t& b, int square) {
-        b &= ~(uint64_t{1} << square);
+    void popSquare(Bitboard& bb, int square) {
+        bb &= ~(Bitboard{1} << square);
     }
 
-    void printBB(const uint64_t& b) {
+    void printBB(const Bitboard& bb) {
         std::cout << '\n';
-        for(int rank = RANK1; rank < N_RANKS; ++rank) {
-            for(int file = FILEA; file < N_FILES; ++file) {
-                if(file == FILEA) std::cout << "  " << 8-rank << "  ";
-                std::cout << (getBit(b, Square(rank * N_FILES + file)) ? " x " : " . ");
+        for(Rank rank = 0; rank < 8; ++rank) {
+            for(File file = 0; file < 8; ++file) {
+                if(file == 0) std::cout << "  " << 8-rank << "  ";
+                std::cout << (getSquare(bb, convertToSquare(rank, file)) ? " x " : " . ");
             }
             std::cout << '\n';
         }
         // print files
         std::cout << "\n      a  b  c  d  e  f  g  h\n\n"; 
 
-        std::cout << "      Integer representation: " << b << "\n\n";
+        std::cout << "      Integer representation: " << bb << "\n\n";
     }
+
+    Square convertToSquare(Rank rank, File file) {
+        return Square(rank * 8 + file);
+    }
+
+    Rank getRank(Square square) {
+        return Rank(square/8);
+    }
+
+    File getFile(Square square) {
+        return File(square%8);
+    }
+
+    int getRankShift(Square square) {
+        return getFile(square)*8+1;
+    }
+
 }

@@ -13,27 +13,27 @@ namespace dunsparce::attacks {
     inline std::array<Bitboard, N_SQUARES> kings;
 
     template <Color to_move>
-    inline Bitboard generatePawnAttacks(Square square) {
-        Bitboard attack_bb{ uint64_t{0} };
+    inline Bitboard generatePawnAttacks(Square source) {
+        Bitboard attack_bb{ ZERO };
         // bb with only from square
-        const Bitboard pawn_bb{ utils::squareToBB(square) };
+        const Bitboard pawn_bb{ utils::squareToBB(source) };
 
         // generate relative moves
-        if((utils::shiftRel<to_move>(pawn_bb, NORTH_WEST)) & (~FILEA_BB)) attack_bb |= (utils::shiftRel<to_move>(pawn_bb, NORTH_WEST));
-        if((utils::shiftRel<to_move>(pawn_bb, NORTH_EAST)) & (~FILEH_BB)) attack_bb |= (utils::shiftRel<to_move>(pawn_bb, NORTH_EAST));
+        if((utils::shiftRel<to_move>(pawn_bb, NORTH_WEST)) & NOT_FILEA_BB) attack_bb |= (utils::shiftRel<to_move>(pawn_bb, NORTH_WEST));
+        if((utils::shiftRel<to_move>(pawn_bb, NORTH_EAST)) & NOT_FILEH_BB) attack_bb |= (utils::shiftRel<to_move>(pawn_bb, NORTH_EAST));
     
         return attack_bb;
     }
 
-    Bitboard generateKnightAttacks(Square square);
+    Bitboard generateKnightAttacks(Square source);
 
-    Bitboard generateBishopAttacksNoBlockers(Square square);
+    Bitboard generateBishopAttacksNoBlockers(Square source);
 
-    Bitboard generateBishopAttacksWithBlockers(Square square, const Bitboard& occupany_bb);
+    Bitboard generateBishopAttacksWithBlockers(Square source, const Bitboard& occupany_bb);
 
-    Bitboard generateRookAttacksNoBlockers(Square square);
+    Bitboard generateRookAttacksNoBlockers(Square source);
 
-    Bitboard generateRookAttacksWithBlockers(Square square, const Bitboard& occupany_bb);
+    Bitboard generateRookAttacksWithBlockers(Square source, const Bitboard& occupany_bb);
 
     void initLeapersAttacks();
 
