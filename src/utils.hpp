@@ -11,44 +11,40 @@
 #include "constants.hpp"
 namespace dunsparce::utils {
 
-    Square convertToSquare(Rank rank, File file);
+Square convertToSquare(Rank rank, File file);
 
-    Rank getRank(Square square);
-    File getFile(Square square);
+Rank getRank(Square square);
+File getFile(Square square);
 
-    int getRankShift(Square square);
-    
-    char pieceToChar(const Piece& piece);
-    Piece charToPiece(char c);
-    std::string pieceToUnicode(Piece piece);
-    std::string_view squareToCoordinates(Square square);
+int getRankShift(Square square);
 
-    std::vector<std::string> tokenize(const std::string& str);
+char pieceToChar(const Piece& piece);
+Piece charToPiece(char c);
+std::string pieceToUnicode(Piece piece);
+std::string_view squareToCoordinates(Square square);
 
-    void printBits(uint64_t bits);
+std::vector<std::string> tokenize(const std::string& str);
 
-    int popcount(uint64_t b);
+void printBits(Bitboard bits);
 
-    bool getSquare(const uint64_t& b, Square square);
-    void setSquare(uint64_t& b, Square square);
-    // lsb
-    // returns 64 if bitboard is empty
-    Square getFirstSquare(const Bitboard& b);
+int popcount(Bitboard b);
 
-    void popSquare(uint64_t& b, int square);
+bool getSquare(const Bitboard& bb, Square square);
+void setSquare(Bitboard& bb, Square square);
+// lsb
+// returns 64 if bitboard is empty
+Square getFirstSquare(const Bitboard& bb);
 
-    Bitboard squareToBB(Square square);
+void popSquare(Bitboard& bb, int square);
 
-    void printBB(const uint64_t& b);
+Bitboard squareToBB(Square square);
 
-    template <Color color>
-    inline Bitboard shiftRel(Bitboard bb, int val) {
-        if constexpr (color == WHITE) {
-            bb >>= val;
-        } else {
-            bb <<= val;
-        }
-        return bb;
-    }
+void printBB(const Bitboard& bb);
 
-}
+Bitboard shiftRel(Bitboard bb, int val, Color color);
+
+Color oppSide(Color color);
+
+bool isSquareEmpty(const Bitboard& bb, Square square);
+
+} // namespace dunsparce::utils

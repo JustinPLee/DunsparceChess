@@ -65,4 +65,4 @@ void executeAll(std::vector<std::function<void()>>& allTests) {
     }
 }
 
-}
+} // namespace my_testing_thing

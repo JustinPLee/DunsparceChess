@@ -5,11 +5,9 @@
 #include "../../types.hpp"
 #include "../../constants.hpp"
 
-namespace dunsparce::tables {}
-
 namespace dunsparce::tables::relevant_bits { // makes magic generation easier
 
-    inline constexpr std::array<int, N_SQUARES> bishops {
+    inline constexpr std::array<int, NSquares> bishops {
         6, 5, 5, 5, 5, 5, 5, 6, 
         5, 5, 5, 5, 5, 5, 5, 5, 
         5, 5, 7, 7, 7, 7, 5, 5, 
@@ -20,7 +18,7 @@ namespace dunsparce::tables::relevant_bits { // makes magic generation easier
         6, 5, 5, 5, 5, 5, 5, 6
     };
 
-    inline constexpr std::array<int, N_SQUARES> rooks {
+    inline constexpr std::array<int, NSquares> rooks {
         12, 11, 11, 11, 11, 11, 11, 12, 
         11, 10, 10, 10, 10, 10, 10, 11, 
         11, 10, 10, 10, 10, 10, 10, 11, 
@@ -31,12 +29,13 @@ namespace dunsparce::tables::relevant_bits { // makes magic generation easier
         12, 11, 11, 11, 11, 11, 11, 12
     };
 
-} // dunsparce::tables::relevant_bits
+} // namespace dunsparce::tables::relevant_bits
 
 
 // computed using magic::init()
 namespace dunsparce::tables::magics {
-    constexpr inline std::array<Bitboard, N_SQUARES> rooks {
+
+    constexpr inline std::array<Bitboard, NSquares> rooks {
         0x8a80104000800020ULL,
         0x140002000100040ULL,
         0x2801880a0017001ULL,
@@ -102,7 +101,8 @@ namespace dunsparce::tables::magics {
         0x2006104900a0804ULL,
         0x1004081002402ULL
     };
-    constexpr inline std::array<Bitboard, N_SQUARES> bishops{
+
+    constexpr inline std::array<Bitboard, NSquares> bishops {
         0x40040844404084ULL,
         0x2004208a004208ULL,
         0x10190041080202ULL,
@@ -168,4 +168,87 @@ namespace dunsparce::tables::magics {
         0x8918844842082200ULL,
         0x4010011029020020ULL
     };
-} // dunsparce::tables::magics
+
+} // namespace dunsparce::tables::magics
+
+
+namespace dunsparce::tables::values {
+
+constexpr std::array<int, 64> pawns {
+    0,  0,  0,  0,  0,  0,  0,  0,
+    50, 50, 50, 50, 50, 50, 50, 50,
+    10, 10, 20, 30, 30, 20, 10, 10,
+    5,  5, 10, 25, 25, 10,  5,  5,
+    0,  0,  0, 20, 20,  0,  0,  0,
+    5, -5,-10,  0,  0,-10, -5,  5,
+    5, 10, 10,-20,-20, 10, 10,  5,
+    0,  0,  0,  0,  0,  0,  0,  0
+};
+
+constexpr std::array<int, 64> knights {
+    -50,-40,-30,-30,-30,-30,-40,-50,
+    -40,-20,  0,  0,  0,  0,-20,-40,
+    -30,  0, 10, 15, 15, 10,  0,-30,
+    -30,  5, 15, 20, 20, 15,  5,-30,
+    -30,  0, 15, 20, 20, 15,  0,-30,
+    -30,  5, 10, 15, 15, 10,  5,-30,
+    -40,-20,  0,  5,  5,  0,-20,-40,
+    -50,-40,-30,-30,-30,-30,-40,-50
+};
+
+constexpr std::array<int, 64> bishops {
+    -20,-10,-10,-10,-10,-10,-10,-20,
+    -10,  0,  0,  0,  0,  0,  0,-10,
+    -10,  0,  5, 10, 10,  5,  0,-10,
+    -10,  5,  5, 10, 10,  5,  5,-10,
+    -10,  0, 10, 10, 10, 10,  0,-10,
+    -10, 10, 10, 10, 10, 10, 10,-10,
+    -10,  5,  0,  0,  0,  0,  5,-10,
+    -20,-10,-10,-10,-10,-10,-10,-20
+};
+
+constexpr std::array<int, 64> rooks {
+    0,  0,  0,  0,  0,  0,  0,  0,
+    5, 10, 10, 10, 10, 10, 10,  5,
+    -5,  0,  0,  0,  0,  0,  0, -5,
+    -5,  0,  0,  0,  0,  0,  0, -5,
+    -5,  0,  0,  0,  0,  0,  0, -5,
+    -5,  0,  0,  0,  0,  0,  0, -5,
+    -5,  0,  0,  0,  0,  0,  0, -5,
+    0,  0,  0,  5,  5,  0,  0,  0
+};
+
+constexpr std::array<int, 64> queens {
+    -20,-10,-10, -5, -5,-10,-10,-20,
+    -10,  0,  0,  0,  0,  0,  0,-10,
+    -10,  0,  5,  5,  5,  5,  0,-10,
+    -5,  0,  5,  5,  5,  5,  0, -5,
+    0,  0,  5,  5,  5,  5,  0, -5,
+    -10,  5,  5,  5,  5,  5,  0,-10,
+    -10,  0,  5,  0,  0,  0,  0,-10,
+    -20,-10,-10, -5, -5,-10,-10,-20
+};
+
+constexpr std::array<int, 64> king_midgame {
+    -30,-40,-40,-50,-50,-40,-40,-30,
+    -30,-40,-40,-50,-50,-40,-40,-30,
+    -30,-40,-40,-50,-50,-40,-40,-30,
+    -30,-40,-40,-50,-50,-40,-40,-30,
+    -20,-30,-30,-40,-40,-30,-30,-20,
+    -10,-20,-20,-20,-20,-20,-20,-10,
+     20, 20,  0,  0,  0,  0, 20, 20,
+     20, 30, 10,  0,  0, 10, 30, 20
+};
+
+constexpr std::array<int, 64> king_endgame {
+    -50,-40,-30,-20,-20,-30,-40,-50,
+    -30,-20,-10,  0,  0,-10,-20,-30,
+    -30,-10, 20, 30, 30, 20,-10,-30,
+    -30,-10, 30, 40, 40, 30,-10,-30,
+    -30,-10, 30, 40, 40, 30,-10,-30,
+    -30,-10, 20, 30, 30, 20,-10,-30,
+    -30,-30,  0,  0,  0,  0,-30,-30,
+    -50,-30,-30,-30,-30,-30,-30,-50
+};
+
+} // namespace dunsparce::tables::values
