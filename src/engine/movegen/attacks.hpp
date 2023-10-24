@@ -4,7 +4,7 @@
 
 #include "../../types.hpp"
 #include "../../constants.hpp"
-
+#include "../../board.hpp"
 namespace dunsparce::attacks {
 
 inline std::array<std::array<Bitboard, NColors>, NSquares> pawns; // pawns can only move in one direction
@@ -17,7 +17,7 @@ inline std::array<Bitboard, NSquares> rooks_all;
 inline std::array<std::array<Bitboard, NSquares>, 512> bishops;
 inline std::array<std::array<Bitboard, NSquares>, 4096> rooks;
 
-Bitboard generatePawnAttacks(Square source, Color side);
+Bitboard generatePawnAttacks(Color side, Square source);
 
 Bitboard generateKnightAttacks(Square source);
 
@@ -29,13 +29,17 @@ Bitboard generateRookAttacksNoBlockers(Square source);
 
 Bitboard generateRookAttacksWithBlockers(Square source, const Bitboard& occupany_bb);
 
-Bitboard getBishopAttacks(Square square, Bitboard occupancy_bb);
-Bitboard getRookAttacks(Square square, Bitboard occupancy_bb);
-Bitboard getQueenAttacks(Square square, const Bitboard& occupancy_bb);
+Bitboard getBishopAttacks(Square source, Bitboard occupancy_bb);
+Bitboard getRookAttacks(Square source, Bitboard occupancy_bb);
+Bitboard getQueenAttacks(Square source, const Bitboard& occupancy_bb);
 
-bool isSquareAttacked(Square square, Color side, const std::array<Bitboard, NPieces>& pieces, const Bitboard& occupancy_bb);
+bool isSquareAttacked(Square source, Color side, const Board& board);
 
-void initLeapersAttacks();
-void initSlidersAttacks(BishopOrRook p_type);
+void initPawnAttacks();
+void initKnightAttacks();
+void initBishopAttacks();
+void initRookAttacks();
+void initKingAttacks();
+void initAllAttacks();
 
 } // namespace dunsparce::attacks

@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "types.hpp"
 #include "move.hpp"
 #include "utils.hpp"
@@ -15,29 +17,45 @@ Move::Move(Square from_square, Square to_square, Piece piece, Piece promoted_pie
         (castling_flag      << 23) 
     } {}
 
-Square getFromSquare(const Move& move) {
-    return Square((move.move & 0x3f));
+Square Move::get_from_square() const {
+    return Square((move & 0x3f));
 }
-Square getToSquare(const Move& move) {
-    return Square((move.move & 0xfc0) >> 6);
+Square Move::get_to_square() const {
+    return Square((move & 0xfc0) >> 6);
 }
-Piece getPiece(const Move& move) {
-    return Piece((move.move & 0xf000) >> 12);
+Piece Move::get_piece() const {
+    return Piece((move & 0xf000) >> 12);
 }
-Piece getPromotedPiece(const Move& move) {
-    return Piece((move.move & 0xf0000) >> 16);
+Piece Move::get_promoted_piece() const {
+    return Piece((move & 0xf0000) >> 16);
 }
-bool getCaptureFlag(const Move& move) {
-    return (move.move & 0x100000);
+bool Move::get_capture_flag() const {
+    return (move & 0x100000);
 }
-bool getDoublePushFlag(const Move& move) {
-    return (move.move & 0x200000);
+bool Move::get_double_push_flag() const {
+    return (move & 0x200000);
 }
-bool getCroissantFlag(const Move& move) {
-    return (move.move & 0x400000);
+bool Move::get_croissant_flag() const {
+    return (move & 0x400000);
 }
-bool getCastlingFlag(const Move& move) {
-    return (move.move & 0x800000);
+bool Move::get_castling_flag() const {
+    return (move & 0x800000);
+}
+
+std::ostream& operator<<(std::ostream& out, const Move& move) {
+    using namespace utils;
+    using namespace move;
+    std::cout << "("
+              << "From: "           << squareToCoordinates(move.get_from_square())  << ", "
+              << "To: "             << squareToCoordinates(move.get_to_square())    << ", "
+              << "Piece: "          << pieceToUnicode(move.get_piece())             << ", "
+              << "Promoted piece: " << pieceToUnicode(move.get_promoted_piece())    << ", "
+              << "Capture: "        << (move.get_capture_flag() ? 'T' : 'F')        << ", "
+              << "Double push: "    << (move.get_double_push_flag() ? 'T' : 'F')    << ", "
+              << "Croissant: "      << (move.get_croissant_flag() ? 'T' : 'F')      << ", "
+              << "Castle: "         << (move.get_castling_flag() ? 'T' : 'F')
+              << ")";
+    return out;
 }
 
 } // namespace dunsparce::move

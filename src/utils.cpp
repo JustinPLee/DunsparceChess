@@ -15,7 +15,7 @@
 namespace dunsparce::utils {
 
 char pieceToChar(Piece piece) {
-    static const std::array<char, NPieces+2> names{"PNBRQKpnbrqk-"};
+    static const std::array<char, NPieces+2> names{"PNBRQKpnbrqk?"};
     return names[int(piece)];
 }
 
@@ -39,7 +39,7 @@ Piece charToPiece(char c) {
 }
 
 std::string pieceToUnicode(Piece piece) {
-    static const std::array<std::string, NPieces+1> unicode_chars{"♙","♘","♗","♖","♕","♔","♟︎","♞","♝","♜","♛","♚", "-"};
+    static const std::array<std::string, NPieces+2> unicode_chars{"♙","♘","♗","♖","♕","♔","♟︎","♞","♝","♜","♛","♚", "?"};
     return unicode_chars[int(piece)];
 }
 
@@ -90,13 +90,6 @@ int popcount(Bitboard bb) {
     return count;
 }
 
-bool getSquare(const Bitboard& bb, Square square) {
-    return bb & (One << square);
-}
-void setSquare(Bitboard& bb, Square square) {
-    bb |= (One << square);
-}
-
 // lsb (from topleft)
 Square getFirstSquare(const Bitboard& bb) {
     if (bb) {
@@ -112,10 +105,10 @@ void popSquare(Bitboard& bb, int square) {
 
 void printBB(const Bitboard& bb) {
     std::cout << '\n';
-    for(Rank rank = 0; rank < 8; ++rank) {
-        for(File file = 0; file < 8; ++file) {
+    for(int rank = 0; rank < 8; ++rank) {
+        for(int file = 0; file < 8; ++file) {
             if(file == 0) std::cout << "  " << 8-rank;
-            std::cout << (getSquare(bb, convertToSquare(rank, file)) ? " x" : " .");
+            std::cout << (bb & (One << (rank*8+file)) ? " x" : " .");
         }
         std::cout << '\n';
     }
@@ -123,27 +116,6 @@ void printBB(const Bitboard& bb) {
     std::cout << "    a b c d e f g h\n\n"; 
 
     std::cout << " Integer representation: " << bb << "\n\n";
-}
-
-Square convertToSquare(Rank rank, File file) {
-    return Square(rank * 8 + file);
-}
-
-Rank getRank(Square square) {
-    return Rank(square/8);
-}
-
-File getFile(Square square) {
-    return File(square%8);
-}
-
-Bitboard shiftRel(Bitboard bb, int val, Color color) {
-    if (color == White) {
-        bb >>= val;
-    } else {
-        bb <<= val;
-    }
-    return bb;
 }
 
 Color oppSide(Color color) {
@@ -159,7 +131,7 @@ Piece createPiece(Color color, BasePiece base_piece) {
 }
 
 bool isSquareEmpty(const Bitboard& bb, Square square) {
-    return !utils::getSquare(bb, square);
+    return !(bb & (One << square));
 }
 
 } // namespace dunsparce::utils

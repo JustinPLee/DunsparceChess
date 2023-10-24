@@ -37,7 +37,7 @@ class Board {
          * @return `int` Total piece value
          * @notetemplate <typename Color> ?
         */
-        int getPieceMaterial();
+        int get_material();
 
         /**
          * Reverses the POV from white to black or black to white.
@@ -61,7 +61,12 @@ class Board {
         void printMoves() const;
         void printMove(int index) const;
 
-        void generateAllMoves();
+        Bitboard get_piece_bb(Color color, BasePiece base_piece) const;
+        Bitboard get_piece_bb(Piece piece) const;
+        Bitboard get_occupancy_bb(Color color) const;
+        Square get_croissant_square() const;
+        uint8_t get_castling() const;
+        std::vector<move::Move> get_moves() const;
 
         uint64_t generateZobristKey();
 

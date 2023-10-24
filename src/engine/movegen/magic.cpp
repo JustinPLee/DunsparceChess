@@ -2,43 +2,38 @@
 
 #include <iostream>
 #include <array>
-#include <stdio.h>
 
 #include "../../types.hpp"
 #include "../../utils.hpp"
 #include "../../constants.hpp"
 #include "attacks.hpp"
 #include "tables.hpp"
-
 namespace dunsparce::magic {
 
-void init() {
+void initMagic() {
+    /*
     for(int i = 0; i < NSquares; ++i) {
-        // printf(" 0x%llxULL\n", getMagicHash(Square(i), tables::relevant_bits::rooks[i], ROOK));
-        // printf(" 0x%llxULL\n", getMagicHash(Square(i), tables::relevant_bits::bishops[i], BISHOP));
+        tables::magics::rooks[i] = generateMagicNumber(Square(i), tables::relevant_bits::rooks[i], BaseRook);
+        tables::magics::bishops[i] = generateMagicNumber(Square(i), tables::relevant_bits::bishops[i], BaseBishop);
     }
+    */
+   std::cout << "don't init magic\n";
 }
 
-Bitboard generateAttackPermutation(int index, int relevant_bits, Bitboard attack_bb) {
-
+Bitboard generateOccupancyBBPermutation(int index, int relevant_bits, Bitboard attack_bb) {
     // init occupancy
     Bitboard occupancy_bb{ Zero };
-
     // loop over every possible attacked squares
     for(int nth_bit = 0; nth_bit < relevant_bits; ++nth_bit) {
-
         // store first square
         const Square square{ utils::getFirstSquare(attack_bb) };
-
         // remove square from remaining list of possible squares
         utils::popSquare(attack_bb, square);
-        
         // only set bits under the index mask
         if(index & (1 << nth_bit)) {
-            utils::setSquare(occupancy_bb, square);
+            occupancy_bb |= (One << square);
         }
     }
-    
     return occupancy_bb;
 }
 
@@ -50,72 +45,52 @@ uint32_t reseed() {
     return seed;
 }
 
-Bitboard generateMagicNumber() {
-    // slice bits up to 16
-    const auto randMagicNumber = []() {
-
-        // create four, random 16 bit slices
-        Bitboard n1 = Bitboard{ reseed() } & 0xFFFF;
-        Bitboard n2 = Bitboard{ reseed() } & 0xFFFF;
-        Bitboard n3 = Bitboard{ reseed() } & 0xFFFF;
-        Bitboard n4 = Bitboard{ reseed() } & 0xFFFF;
-
-        // combine slices at the according positions
-        return n1 | (n2 << 16) | (n3 << 32) | (n4 << 48);
-    };
-
-    // further randomize magic number
-    return randMagicNumber() & randMagicNumber() & randMagicNumber() & randMagicNumber();
+Bitboard generateRandomBB() {
+    // create four, random 16 bit slices
+    Bitboard n1 = Bitboard{ reseed() } & 0xFFFF;
+    Bitboard n2 = Bitboard{ reseed() } & 0xFFFF;
+    Bitboard n3 = Bitboard{ reseed() } & 0xFFFF;
+    Bitboard n4 = Bitboard{ reseed() } & 0xFFFF;
+    // combine slices at the according positions
+    return n1 | (n2 << 16) | (n3 << 32) | (n4 << 48);
 }
 
-Bitboard getMagicHash(Square source, int relevant_bits, BishopOrRook p_type) {   
+Bitboard generateMagicNumber(Square source, int relevant_bits, BasePiece base_piece) {   
     /*  the max number of relevant bits is 12
         2^12 is 4096, covering all permutations
         (remember: ideally one time cost)   */
-
     std::array<Bitboard, 4096> occupancy_tables{ Zero };
-    
     std::array<Bitboard, 4096> attack_tables{ Zero };
-    
     std::array<Bitboard, 4096> used_attack_tables{ Zero };
-
     // get all possible attack squares
-    Bitboard attack_bb = (p_type == Bishop) ? attacks::generateBishopAttacksNoBlockers(source) : attacks::generateRookAttacksNoBlockers(source);
-
+    Bitboard attack_mask = (base_piece == BaseBishop) ? attacks::generateBishopAttacksNoBlockers(source) : attacks::generateRookAttacksNoBlockers(source);
     // get num of possible permutations
-    int num_permutations{ 1 << relevant_bits };
-    
-    for(int p_idx = 0; p_idx < num_permutations; ++p_idx) {
+    int occupancy_indicies{ 1 << relevant_bits };
+    for(int index = 0; index < occupancy_indicies; ++index) {
         // populate occupancy tables with all possible attacks
-        occupancy_tables[p_idx] = generateAttackPermutation(p_idx, relevant_bits, attack_bb);
-
+        occupancy_tables[index] = generateOccupancyBBPermutation(index, relevant_bits, attack_mask);
         // populate proper attack tables with blocked attacks using occupancy tables
         // i do this to generate a properly formed ray, for example this sequence of bits for a rook is invalid: 00011001
-        attack_tables[p_idx] = (p_type == Bishop) ? attacks::generateBishopAttacksWithBlockers(source, occupancy_tables[p_idx]) : attacks::generateRookAttacksWithBlockers(source, occupancy_tables[p_idx]);
+        attack_tables[index] = (base_piece == BaseBishop) ? attacks::generateBishopAttacksWithBlockers(source, occupancy_tables[index]) : attacks::generateRookAttacksWithBlockers(source, occupancy_tables[index]);
     }
-
     // loop a bunch of times to find a valid magic hash
     // (this should very rarely fail)
-    for(int i = 0; i < 1000000000; ++i) {
+    for(int i = 0; i < 10000000; ++i) {
         // randomly populated bitboard
-        Bitboard magic_num{ generateMagicNumber() };
-        
+        Bitboard magic_num{ generateRandomBB() & generateRandomBB() & generateRandomBB() & generateRandomBB() };
         // skip if too few bits
-        if(utils::popcount((attack_bb * magic_num) & 0xFF00000000000000) < 6) continue;
-
+        if(utils::popcount((attack_mask * magic_num) & 0xFF00000000000000) < 6) continue;
         bool fail{ false };
-
         // loop over every permutation
-        for(int index = 0; index < num_permutations; ++index) {
+        for(int index = 0; index < occupancy_indicies; ++index) {
             // plug in candidate magic_num into known formula
             int magic_index{ static_cast<int>((occupancy_tables[index] * magic_num) >> (64 - relevant_bits)) };
-            
             // check that the magic hash correctly transforms every position
             // store seen positions in used_attack_tables
             // if the tables do not match, the magic number is invalid
             if(used_attack_tables[magic_index] == Zero) {
-                used_attack_tables[magic_index] = attack_tables[magic_index];
-            } else if(used_attack_tables[magic_index] != attack_tables[magic_index]) {
+                used_attack_tables[magic_index] = attack_tables[index];
+            } else if(used_attack_tables[magic_index] != attack_tables[index]) {
                 fail = true;
                 break;
             }
@@ -124,9 +99,7 @@ Bitboard getMagicHash(Square source, int relevant_bits, BishopOrRook p_type) {
             return magic_num;
         }
     }
-    // no magic num found
-    std::cout << "ERROR!";
-
+    std::cout << "Fail\n";
     return 0ULL;
 }
 

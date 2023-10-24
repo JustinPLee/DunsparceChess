@@ -14,6 +14,9 @@
 #include "../src/move.hpp"
 #include "../src/utils.hpp"
 #include "../src/uci.hpp"
+#include "../src/engine/movegen/movegen.hpp"
+#include "../src/engine/movegen/magic.hpp"
+#include "../src/engine/movegen/attacks.hpp"
 
 using namespace my_testing_thing;
 
@@ -28,23 +31,20 @@ namespace dunsparce::tests {
  ****************/
 
 
-void testBitboardOperations() {
-    std::cout << "Bitboard Operations\n";
-    std::cout << "===================\n";
+void testPseudoLegalMoveGeneration() {
+    std::cout << "Pseudolegal Move Generation\n";
+    std::cout << "===========================\n";
+
+    test("Starting Fen", [&]() {
+        Board board{};
+        board.parseFen(constants::fens::starting);
+        movegen::generatePseudoLegalPawnMoves(White, board);
+        movegen::generatePseudoLegalPawnMoves(Black, board);
+        pray(board.getMoves().size() == 32);
+    });
+
 }
 
-/**
- * TODO: fix exportFen
-*/
-void testReadFen() {
-    std::cout << "Reading/Exporting FEN\n";
-    std::cout << "=====================\n";
-}
-
-void testMoveRepr() {
-    std::cout << "Move Representation\n";
-    std::cout << "===================\n";
-}
 
 void testSanity() {
     std::cout << "Sanity Check\n";
@@ -54,14 +54,21 @@ void testSanity() {
 
 }
 
+void initAll() {
+    using namespace dunsparce;
+    attacks::initLeapersAttacks();
+    attacks::initSlidersAttacks(Rook);
+    attacks::initSlidersAttacks(Bishop);
+}
+
 int main() {
-    using namespace dunsparce::tests;
+    using namespace dunsparce;
+
+    initAll();
 
     std::vector<std::function<void()>> allTests {
-        testBitboardOperations,
-        testReadFen,
-        testMoveRepr,
-        testSanity
+        tests::testPseudoLegalMoveGeneration,
+        tests::testSanity
     };
 
     executeAll(allTests);

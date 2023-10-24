@@ -10,8 +10,6 @@ namespace dunsparce {
 */
 
 using Bitboard = uint64_t;
-using Rank = int;
-using File = int;
 
 constexpr uint64_t One{ 1ULL };
 constexpr uint64_t Zero{ 0ULL };
@@ -31,6 +29,10 @@ enum Square {
     NSquares = 64, NullSquare = 65
 };
 
+inline int rank_of(Square square) { return (square / 8); }
+inline int file_of(Square square) { return (square % 8); }
+inline Square get_square(int rank, int file) { return Square(rank * 8 + file); }
+inline int get_square_index(int rank, int file) { return (rank * 8 + file); }
 
 /**
  * Type for abs Direction
@@ -45,7 +47,6 @@ enum Direction {
     SouthWest = South - West,
     SouthEast = South + East,
 };
-
 
 /**
  * Types for each piece
@@ -73,7 +74,7 @@ enum Piece {
     WRook,
     WQueen,
     WKing,
-    NullPiece = 13,
+    NullPiece = 12,
     NPieces = 12,
 };
 

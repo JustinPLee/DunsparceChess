@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 #include "types.hpp"
 #include "constants.hpp"
@@ -36,7 +37,7 @@ void Board::parseFen(const std::string& fen) {
         for(size_t idx = 0; idx < piece_str.length(); ++idx) {
             if(std::isalpha(piece_str[idx])) {
                 Piece piece{ utils::charToPiece(piece_str[idx]) };
-                utils::setSquare(pieces_[int(piece)], Square(square_idx));
+                pieces_[int(piece)] |= (One << square_idx);
                 ++square_idx;
             } else if(std::isdigit(piece_str[idx])) {
                 square_idx += piece_str[idx]-'0';
@@ -64,7 +65,7 @@ void Board::parseFen(const std::string& fen) {
     auto init_croissant = [&]() {
         std::string croissant{ fields[3] };
         if(croissant != "-") {
-            croissant_ = utils::convertToSquare(8 - (croissant[1] - '0'), croissant[0] - 'a');
+            croissant_ = get_square(8 - (croissant[1] - '0'), croissant[0] - 'a');
         } else {
             croissant = NullSquare;
         }
@@ -82,7 +83,7 @@ void Board::parseFen(const std::string& fen) {
     for(int i = 0; i <= 5; ++i) {
         occupancies_[Black] |= pieces_[i];
     }
-    for(int i = 6; i <= NPieces; ++i) {
+    for(int i = 6; i < NPieces; ++i) {
         occupancies_[White] |= pieces_[i];
     }
     occupancies_[Both] = occupancies_[Black] | occupancies_[White];
@@ -140,7 +141,7 @@ void Board::print() {
                 if(file == 0) std::cout << "  " << 8-rank;
                 std::string piece_repr = ".";
                 for(int piece = 0; piece < NPieces; ++piece) {
-                    if(utils::getSquare(pieces_[piece], utils::convertToSquare(rank, file))) {
+                    if(pieces_[piece] & (One << get_square(rank, file))) {
                         piece_repr = utils::pieceToUnicode(Piece(piece));
                         break;
                     }
@@ -156,7 +157,7 @@ void Board::print() {
                 if(file == 0) std::cout << "  " << rank+1;
                 std::string piece_repr = ".";
                 for(int piece = 0; piece < NPieces; ++piece) {
-                    if(utils::getSquare(pieces_[piece], utils::convertToSquare(7-rank, 7-file))) {
+                    if(pieces_[piece] & (One << get_square(7-rank, 7-file))) {
                         piece_repr = utils::pieceToUnicode(Piece(piece));
                         break;
                     }
@@ -177,7 +178,7 @@ void Board::print() {
     std::cout << "\n\n";
 }
 
-int Board::getPieceMaterial() {
+int Board::get_material() {
     return 200;
 }
 
@@ -196,17 +197,7 @@ int Board::addMove(Square from_square, Square to_square, Piece piece, Piece prom
 }
 
 void Board::printMove(int index) const {
-    using namespace utils;
-    using namespace move;
-    std::cout << "Move #" << index << " (";
-    std::cout << "From: " << squareToCoordinates(getFromSquare(move_list_[index])) << ", "
-              << "To: " << squareToCoordinates(getToSquare(move_list_[index])) << ", "
-              << "Piece: " << pieceToChar(getPiece(move_list_[index])) << ", "
-              << "Promoted piece: " << pieceToChar(getPromotedPiece(move_list_[index])) << ", "
-              << "Capture: " << (getCaptureFlag(move_list_[index]) ? 'T' : 'F') << ", "
-              << "Double push: " << (getDoublePushFlag(move_list_[index]) ? 'T' : 'F') << ", "
-              << "Croissant: " << (getCroissantFlag(move_list_[index]) ? 'T' : 'F') << ", "
-              << "Castle: " << (getCastlingFlag(move_list_[index]) ? 'T' : 'F') << ")\n";
+    std::cout << "Move #" << index+1 << " " << move_list_[index] << '\n';
 }
 
 void Board::printMoves() const {
@@ -215,13 +206,28 @@ void Board::printMoves() const {
     }
 }
 
-void Board::generateAllMoves() {
-    movegen::generatePseudoLegalPawnMoves(side_, *this);
-    movegen::generatePseudoLegalKnightMoves(side_, *this);
-    movegen::generatePseudoLegalBishopMoves(side_, *this);
-    movegen::generatePseudoLegalRookMoves(side_, *this);
-    movegen::generatePseudoLegalQueenMoves(side_, *this);
-    movegen::generatePseudoLegalKingMoves(side_, *this);
+
+Bitboard Board::get_piece_bb(Color color, BasePiece base_piece) const {
+    return pieces_[utils::createPiece(color, base_piece)];
+}
+
+Bitboard Board::get_piece_bb(Piece piece) const {
+    return pieces_[piece];
+}
+
+Square Board::get_croissant_square() const {
+    return croissant_;
+}
+uint8_t Board::get_castling() const {
+    return castling_;
+}
+
+Bitboard Board::get_occupancy_bb(Color color) const {
+    return occupancies_[color];
+}
+
+std::vector<move::Move> Board::get_moves() const {
+    return move_list_;
 }
 
 } // namespace dunsparce
