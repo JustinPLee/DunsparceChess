@@ -6,6 +6,11 @@
 
 namespace dunsparce::move {
 
+enum MoveType {
+    Quiet,
+    Capture,
+    All
+};
 struct Move {
     Move() = delete;
     explicit Move(Square from_square, Square to_square, Piece piece, Piece promoted_piece, bool capture_flag, bool double_push_flag, bool croissant_flag, bool castling_flag);

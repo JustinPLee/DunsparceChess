@@ -18,15 +18,15 @@ std::string_view squareToCoordinates(Square square);
 
 std::vector<std::string> tokenize(const std::string& str);
 
-void printBits(Bitboard bits);
+void printBits(Bitboard bb);
 
 int popcount(Bitboard b);
 
 // lsb
 // returns 64 if bitboard is empty
-Square getFirstSquare(const Bitboard& bb);
+Square findLSB(const Bitboard& bb);
 
-void popSquare(Bitboard& bb, int square);
+void popSquare(Bitboard& bb, Square square);
 
 void printBB(const Bitboard& bb);
 

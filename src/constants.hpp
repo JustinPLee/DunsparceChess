@@ -21,7 +21,6 @@ constexpr int checkmate_value{ king_value };
  *  Chess Setup
 */
 constexpr int max_ply{ 64 };
-constexpr int max_moves{ 256 };
 
 /**
  *  Files and Ranks

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <array>
 #include <vector>
 #include <string_view>
 
@@ -68,15 +67,28 @@ class Board {
         uint8_t get_castling() const;
         std::vector<move::Move> get_moves() const;
 
+
         uint64_t generateZobristKey();
 
-        std::array<Bitboard, NPieces> pieces_;
-        std::array<Bitboard, NColors> occupancies_;
+    private:
+        std::vector<Bitboard> pieces_;
+        std::vector<Bitboard> occupancies_;
         std::vector<move::Move> move_list_;
         Color side_;
         Square croissant_;
         uint8_t castling_;
         Color pov_;
+
+        struct BoardState {
+            std::vector<Bitboard> pieces_;
+            std::vector<Bitboard> occupancies_;
+            Color side_;
+            Square croissant_;
+            uint8_t castling_;
+        };
+
+        BoardState copyBoardState() const;
+        void consumeBoardState(BoardState& board_state);
 };
 
 } // namespace::dunsparce

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstdint> // uint types
 #include <iostream>
 
 namespace dunsparce {
@@ -11,8 +10,8 @@ namespace dunsparce {
 
 using Bitboard = uint64_t;
 
-constexpr uint64_t One{ 1ULL };
-constexpr uint64_t Zero{ 0ULL };
+constexpr uint64_t One{ uint64_t{1} };
+constexpr uint64_t Zero{ uint64_t{0} };
 
 /**
  * Type for identifying a Square. 
@@ -76,12 +75,6 @@ enum Piece {
     WKing,
     NullPiece = 12,
     NPieces = 12,
-};
-
-// special type for sliding attacks
-enum BishopOrRook {
-    Bishop,
-    Rook
 };
 
 /**

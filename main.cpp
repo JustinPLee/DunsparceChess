@@ -10,19 +10,19 @@
 #include "src/engine/movegen/magic.hpp"
 #include "src/engine/movegen/movegen.hpp"
 
-using namespace dunsparce;
-void initAll() {
-    attacks::initAllAttacks();
-}
 
 int main() {
+    using namespace dunsparce;
+    attacks::initAllAttacks();
 
-    initAll();
-
-    Board board{ constants::fens::test };
-    movegen::generateAllMoves(White, board);
+    Board board{ constants::fens::starting };
+    movegen::populateAllPseudoLegalMoves(Both, board);
     board.printMoves();
     board.print();
+
+
+
+
 
 
 

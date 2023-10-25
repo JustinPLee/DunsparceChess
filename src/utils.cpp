@@ -1,6 +1,5 @@
 
 #include <vector>
-#include <array>
 #include <string>
 #include <sstream>
 #include <bit>
@@ -15,7 +14,7 @@
 namespace dunsparce::utils {
 
 char pieceToChar(Piece piece) {
-    static const std::array<char, NPieces+2> names{"PNBRQKpnbrqk?"};
+    static const std::vector<char> names{ 'P','N','B','R','Q','K','p','n','b','r','q','k','?' };
     return names[int(piece)];
 }
 
@@ -39,12 +38,12 @@ Piece charToPiece(char c) {
 }
 
 std::string pieceToUnicode(Piece piece) {
-    static const std::array<std::string, NPieces+2> unicode_chars{"♙","♘","♗","♖","♕","♔","♟︎","♞","♝","♜","♛","♚", "?"};
+    static const std::vector<std::string> unicode_chars{"♙","♘","♗","♖","♕","♔","♟︎","♞","♝","♜","♛","♚","?"};
     return unicode_chars[int(piece)];
 }
 
 std::string_view squareToCoordinates(Square square) {
-    constexpr static std::array<std::string_view, NSquares+1> square_names {
+    static const std::vector<std::string_view> square_names {
         "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
         "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
         "a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6",
@@ -91,7 +90,7 @@ int popcount(Bitboard bb) {
 }
 
 // lsb (from topleft)
-Square getFirstSquare(const Bitboard& bb) {
+Square findLSB(const Bitboard& bb) {
     if (bb) {
         return Square(popcount((bb & -bb) - 1));
     } else {
@@ -99,7 +98,7 @@ Square getFirstSquare(const Bitboard& bb) {
     }
 }
 
-void popSquare(Bitboard& bb, int square) {
+void popSquare(Bitboard& bb, Square square) {
     bb &= ~(One << square);
 }
 
@@ -108,7 +107,7 @@ void printBB(const Bitboard& bb) {
     for(int rank = 0; rank < 8; ++rank) {
         for(int file = 0; file < 8; ++file) {
             if(file == 0) std::cout << "  " << 8-rank;
-            std::cout << (bb & (One << (rank*8+file)) ? " x" : " .");
+            std::cout << (bb & (One << get_square_index(rank, file)) ? " x" : " .");
         }
         std::cout << '\n';
     }

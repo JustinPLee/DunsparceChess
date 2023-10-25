@@ -11,15 +11,14 @@
 namespace dunsparce {
 
 Board::Board(const std::string& fen) {
-    clear();
     parseFen(fen);
 }
 
 void Board::clear() {
-    // state variables
-    pieces_.fill(Zero);
-    occupancies_.fill(Zero);
-    move_list_.reserve(constants::max_moves);
+    pieces_.reserve(NPieces);
+    for(int i = 0; i < NPieces; ++i) pieces_[i] = Zero;
+    occupancies_.reserve(NColors);
+    for(int i = 0; i < NColors; ++i) occupancies_[i] = Zero;
     croissant_ = NullSquare;
     side_ = White;
     pov_ = White;
@@ -70,7 +69,6 @@ void Board::parseFen(const std::string& fen) {
             croissant = NullSquare;
         }
     };
-
     init_pieces();
     init_side();
     init_castling();
@@ -94,7 +92,6 @@ uint64_t Board::generateZobristKey() { return 0; };
 
 // TODO: FIX exporting repeated pieces
 std::string Board::exportFen() {
-    // squares
     std::string squares = "";
     for(int rank = 0; rank < 8; ++rank) {
         for(int file = 0; file < 8; ++file) {
@@ -102,11 +99,7 @@ std::string Board::exportFen() {
         }
         squares += '/';
     }
-
-    // nextMove
     std::string next_move = (side_ == White ? "w" : "b");
-
-    // castlingRights
     std::string castling = "";
     if(castling_ & constants::castle_wk) {
         castling += 'K';
@@ -120,21 +113,14 @@ std::string Board::exportFen() {
     if(castling_ & constants::castle_bq) {
         castling += 'q';
     }
-
-    // croissant
     std::string croissant = (croissant_ == NullSquare ? "-" : utils::squareToCoordinates(croissant_).data());
-
-    // halfMoves
     std::string half_moves = "0";
-
-    // fullMoves
     std::string full_moves = "0";
 
     return squares + " " + next_move + " " + castling + " " + croissant + " " + half_moves + " " + full_moves;
 }
 
 void Board::print() {
-    // White orientation
     if(pov_ == White) {
         for(int rank = 0; rank < 8; ++rank) {
             for(int file = 0; file < 8; ++file) {
@@ -168,7 +154,6 @@ void Board::print() {
         }
         std::cout << "    h g f e d c b a\n\n";
     }
-
     std::cout << " Side to move: " << ((side_ == White) ? "White" : "Black") << '\n';
     std::cout << " Croissant square: " << ((croissant_ != NullSquare) ? utils::squareToCoordinates(croissant_) : "Null") << '\n';
     std::cout << " Castling: "   << ((castling_ & constants::castle_wk)  ? 'K' : '-')
@@ -206,7 +191,6 @@ void Board::printMoves() const {
     }
 }
 
-
 Bitboard Board::get_piece_bb(Color color, BasePiece base_piece) const {
     return pieces_[utils::createPiece(color, base_piece)];
 }
@@ -228,6 +212,18 @@ Bitboard Board::get_occupancy_bb(Color color) const {
 
 std::vector<move::Move> Board::get_moves() const {
     return move_list_;
+}
+
+Board::BoardState Board::copyBoardState() const {
+    return Board::BoardState{ pieces_, occupancies_, side_, croissant_, castling_ };
+}
+
+void Board::consumeBoardState(Board::BoardState& board_state) {
+    pieces_ = std::move(board_state.pieces_);
+    occupancies_ = std::move(board_state.occupancies_);
+    side_ = board_state.side_;
+    croissant_ = board_state.croissant_;
+    castling_ = board_state.castling_;
 }
 
 } // namespace dunsparce

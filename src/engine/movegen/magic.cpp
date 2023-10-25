@@ -11,12 +11,10 @@
 namespace dunsparce::magic {
 
 void initMagic() {
-    /*
-    for(int i = 0; i < NSquares; ++i) {
-        tables::magics::rooks[i] = generateMagicNumber(Square(i), tables::relevant_bits::rooks[i], BaseRook);
-        tables::magics::bishops[i] = generateMagicNumber(Square(i), tables::relevant_bits::bishops[i], BaseBishop);
-    }
-    */
+    // for(int i = 0; i < NSquares; ++i) {
+    //     tables::magics::rooks[i] = generateMagicNumber(Square(i), tables::relevant_bits::rooks[i], BaseRook);
+    //     tables::magics::bishops[i] = generateMagicNumber(Square(i), tables::relevant_bits::bishops[i], BaseBishop);
+    // }
    std::cout << "don't init magic\n";
 }
 
@@ -24,13 +22,13 @@ Bitboard generateOccupancyBBPermutation(int index, int relevant_bits, Bitboard a
     // init occupancy
     Bitboard occupancy_bb{ Zero };
     // loop over every possible attacked squares
-    for(int nth_bit = 0; nth_bit < relevant_bits; ++nth_bit) {
+    for(int count = 0; count < relevant_bits; ++count) {
         // store first square
-        const Square square{ utils::getFirstSquare(attack_bb) };
+        const Square square{ utils::findLSB(attack_bb) };
         // remove square from remaining list of possible squares
         utils::popSquare(attack_bb, square);
         // only set bits under the index mask
-        if(index & (1 << nth_bit)) {
+        if(index & (1 << count)) {
             occupancy_bb |= (One << square);
         }
     }

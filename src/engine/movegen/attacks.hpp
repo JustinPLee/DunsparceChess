@@ -1,21 +1,32 @@
 #pragma once
 
-#include <array>
+#include <vector>
 
 #include "../../types.hpp"
 #include "../../constants.hpp"
 #include "../../board.hpp"
 namespace dunsparce::attacks {
 
-inline std::array<std::array<Bitboard, NColors>, NSquares> pawns; // pawns can only move in one direction
-inline std::array<Bitboard, NSquares> knights;
-inline std::array<Bitboard, NSquares> kings;
+inline std::vector<std::vector<Bitboard>> pawns(NColors-1, std::vector<Bitboard>(NSquares)); // pawns can only move in one direction
+inline std::vector<Bitboard> knights(NSquares);
+inline std::vector<Bitboard> kings(NSquares);
 
 // sliders
-inline std::array<Bitboard, NSquares> bishops_all;
-inline std::array<Bitboard, NSquares> rooks_all;
-inline std::array<std::array<Bitboard, NSquares>, 512> bishops;
-inline std::array<std::array<Bitboard, NSquares>, 4096> rooks;
+inline std::vector<Bitboard> bishops_unblocked(NSquares);
+inline std::vector<Bitboard> rooks_unblocked(NSquares);
+inline std::vector<std::vector<Bitboard>> bishops(NSquares, std::vector<Bitboard>(512));
+inline std::vector<std::vector<Bitboard>> rooks(NSquares, std::vector<Bitboard>(4096));
+// Doesn't work (???)
+
+// inline Bitboard pawns[NColors-1][NSquares]; // pawns can only move in one direction
+// inline Bitboard knights[NSquares];
+// inline Bitboard kings[NSquares];
+
+// // sliders
+// inline Bitboard bishops_unblocked[NSquares];
+// inline Bitboard rooks_unblocked[NSquares];
+// inline Bitboard bishops[NSquares][512];
+// inline Bitboard rooks[NSquares][4096];
 
 Bitboard generatePawnAttacks(Color side, Square source);
 
@@ -29,11 +40,14 @@ Bitboard generateRookAttacksNoBlockers(Square source);
 
 Bitboard generateRookAttacksWithBlockers(Square source, const Bitboard& occupany_bb);
 
+Bitboard getPawnAttacks(Color side, Square source);
+Bitboard getKnightAttacks(Square source);
+Bitboard getKingAttacks(Square source);
 Bitboard getBishopAttacks(Square source, Bitboard occupancy_bb);
 Bitboard getRookAttacks(Square source, Bitboard occupancy_bb);
 Bitboard getQueenAttacks(Square source, const Bitboard& occupancy_bb);
 
-bool isSquareAttacked(Square source, Color side, const Board& board);
+bool isAttacked(Square source, Color side, const Board& board);
 
 void initPawnAttacks();
 void initKnightAttacks();

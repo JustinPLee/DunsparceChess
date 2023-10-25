@@ -5,19 +5,11 @@
 
 /** Make, UnMake **/
 namespace dunsparce::movegen {
-
-    enum MoveClassification {
-        QUIET,
-        CAPTURE
-    };
-
-    void generatePseudoLegalPawnMoves(Color side, Board& board);
-    void generatePseudoLegalKnightMoves(Color side, Board& board);
-    void generatePseudoLegalBishopMoves(Color side, Board& board);
-    void generatePseudoLegalRookMoves(Color side, Board& board);
-    void generatePseudoLegalKingMoves(Color side, Board& board);
-    void generatePseudoLegalQueenMoves(Color side, Board& board);
-    void generateAllMoves(Color side, Board& board);
-
-
+    void populatePseudoLegalPawnMoves(Color side, Board& board);
+    void populatePseudoLegalKnightMoves(Color side, Board& board);
+    void populatePseudoLegalBishopMoves(Color side, Board& board);
+    void populatePseudoLegalRookMoves(Color side, Board& board);
+    void populatePseudoLegalKingMoves(Color side, Board& board);
+    void populatePseudoLegalQueenMoves(Color side, Board& board);
+    void populateAllPseudoLegalMoves(Color side, Board& board);
 } // namespace dunspare::movegen
