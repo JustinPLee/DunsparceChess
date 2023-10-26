@@ -21,8 +21,8 @@ void Board::clear() {
     for(int i = 0; i < NColors; ++i) occupancies_[i] = Zero;
     croissant_ = NullSquare;
     side_ = White;
-    pov_ = White;
     castling_ = uint8_t{ 0 };
+    pov_ = White;
 }
 
 void Board::parseFen(const std::string& fen) {
@@ -66,7 +66,7 @@ void Board::parseFen(const std::string& fen) {
         if(croissant != "-") {
             croissant_ = get_square(8 - (croissant[1] - '0'), croissant[0] - 'a');
         } else {
-            croissant = NullSquare;
+            croissant_ = NullSquare;
         }
     };
     init_pieces();
@@ -199,6 +199,14 @@ Bitboard Board::get_piece_bb(Piece piece) const {
     return pieces_[piece];
 }
 
+void Board::set_piece_bb(Piece piece, Square square) {
+    pieces_[piece] |= (One << square);
+}
+
+void Board::pop_piece_bb(Piece piece, Square square) {
+    utils::popSquare(pieces_[piece], square);
+}
+
 Square Board::get_croissant_square() const {
     return croissant_;
 }
@@ -215,15 +223,132 @@ std::vector<move::Move> Board::get_moves() const {
 }
 
 Board::BoardState Board::copyBoardState() const {
-    return Board::BoardState{ pieces_, occupancies_, side_, croissant_, castling_ };
+    Board::BoardState copy;
+    copy.pieces = pieces_;
+    copy.occupancies = occupancies_;
+    copy.side = side_;
+    copy.croissant = croissant_;
+    copy.castling = castling_;
+    return copy;
 }
 
-void Board::consumeBoardState(Board::BoardState& board_state) {
-    pieces_ = std::move(board_state.pieces_);
-    occupancies_ = std::move(board_state.occupancies_);
-    side_ = board_state.side_;
-    croissant_ = board_state.croissant_;
-    castling_ = board_state.castling_;
+void Board::restoreBoardState(Board::BoardState&& board_state) {
+    pieces_ = board_state.pieces;
+    occupancies_ = board_state.occupancies;
+    side_ = board_state.side;
+    croissant_ = board_state.croissant;
+    castling_ = board_state.castling;
 }
+
+bool Board::makeMove(const move::Move& move, move::Type move_type, BoardState& copy) {
+    copy = copyBoardState();
+
+    const Square from_square{ move.get_from_square() };
+    const Square to_square{ move.get_to_square() };
+    const Piece piece{ move.get_piece() };
+    const Piece promotion_piece{ move.get_promotion_piece() };
+    const bool capture{ move.get_capture_flag() };
+    const bool double_push{ move.get_double_push_flag() };
+    const bool croissant{ move.get_croissant_flag() };
+    const bool castling{ move.get_castling_flag() };
+
+    pop_piece_bb(piece, from_square);
+    set_piece_bb(piece, to_square);
+
+    if(capture) {
+        const Piece captured_piece_range_start{ (side_ == Black) ? WPawn : BPawn };
+        for(int p = captured_piece_range_start; p < captured_piece_range_start + NPieces/2; ++p) {
+            if(utils::isSquareSet(pieces_[p], to_square)) {
+                pop_piece_bb(Piece(p), to_square);
+                break;
+            }
+        }
+    }
+
+    if(move_type == move::Type::Capture) {}
+
+    if(promotion_piece != NullPiece) {
+        // piece is already at to_square
+        pop_piece_bb((side_ == White) ? WPawn : BPawn, to_square);
+        set_piece_bb(promotion_piece, to_square);
+    }
+
+    if(croissant) {
+        if(side_ == White) {
+            pop_piece_bb(BPawn, Square(to_square + 8)); // south
+        } else {
+            pop_piece_bb(WPawn, Square(to_square - 8)); // north
+        }
+    }
+    
+    croissant_ = NullSquare;
+
+    if(double_push) {
+        if(side_ == White) {
+            croissant_ = Square(to_square + 8);
+        } else {
+            croissant_ = Square(to_square - 8);
+        }
+    }
+
+    if(castling) {
+        switch(int(to_square)) {
+            // white king side
+            case G1:
+                pop_piece_bb(WRook, H1);
+                set_piece_bb(WRook, F1);
+                break;
+            // white queen side
+            case C1:
+                pop_piece_bb(WRook, A1);
+                set_piece_bb(WRook, D1);
+                break;
+            // black king side
+            case G8:
+                pop_piece_bb(BRook, H8);
+                set_piece_bb(BRook, F8);
+                break;
+            // black queen side;
+            case C8:
+                pop_piece_bb(BRook, A8);
+                set_piece_bb(BRook, D8);
+                break;
+        }
+    }
+    // accounts for rook/king moving
+    castling_ &= constants::castling_rights[from_square];
+    // accounts for rooks being captured
+    castling_ &= constants::castling_rights[to_square];
+
+    occupancies_[White] = Zero;
+    occupancies_[Black] = Zero;
+    occupancies_[Both] = Zero;
+
+    for(int piece = BPawn; piece <= BKing; ++piece) {
+        occupancies_[White] |= pieces_[piece];
+    }
+    for(int piece = WPawn; piece <= WKing; ++piece) {
+        occupancies_[Black] |= pieces_[piece];
+    }
+    occupancies_[Both] = occupancies_[White] | occupancies_[Black];
+
+    side_ = Color(side_^1);
+    // king is available to take by an oposing piece. illegal move
+    if(attacks::isAttacked((side_ == White) ? utils::findLSB(get_piece_bb(BKing)) : utils::findLSB(get_piece_bb(WKing)), side_, *this)) {
+        restoreBoardState(std::move(copy));
+        return false;
+    }
+
+    return true;
+}
+
+move::Move Board::get_move(int index) const {
+    return move_list_[index];
+}
+
+void Board::clearMoves() {
+    move_list_.clear();
+}
+
 
 } // namespace dunsparce

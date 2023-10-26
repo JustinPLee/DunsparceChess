@@ -14,6 +14,14 @@ namespace dunsparce {
 class Board {
     public:
         explicit Board(const std::string& fen = constants::fens::starting);
+        struct BoardState {
+            std::vector<Bitboard> pieces;
+            std::vector<Bitboard> occupancies;
+            Color side;
+            Square croissant;
+            uint8_t castling;
+        };
+
         // defaults for essential board information
         // copied and modiified in move gen and eval
 
@@ -57,18 +65,26 @@ class Board {
         // returns index of added move
         int addMove(const move::Move& move);
         int addMove(Square from_square, Square to_square, Piece piece, Piece promoted_piece, bool capture_flag, bool double_push_flag, bool croissant_flag, bool castling_flag);
+        bool makeMove(const move::Move& move, move::Type move_type, BoardState& copy);
+        
         void printMoves() const;
         void printMove(int index) const;
 
         Bitboard get_piece_bb(Color color, BasePiece base_piece) const;
         Bitboard get_piece_bb(Piece piece) const;
+        void set_piece_bb(Piece piece, Square square);
+        void pop_piece_bb(Piece piece, Square square);
         Bitboard get_occupancy_bb(Color color) const;
         Square get_croissant_square() const;
         uint8_t get_castling() const;
         std::vector<move::Move> get_moves() const;
+        move::Move get_move(int index) const;
 
 
         uint64_t generateZobristKey();
+        BoardState copyBoardState() const;
+        void restoreBoardState(BoardState&& board_state);
+        void clearMoves();
 
     private:
         std::vector<Bitboard> pieces_;
@@ -78,17 +94,6 @@ class Board {
         Square croissant_;
         uint8_t castling_;
         Color pov_;
-
-        struct BoardState {
-            std::vector<Bitboard> pieces_;
-            std::vector<Bitboard> occupancies_;
-            Color side_;
-            Square croissant_;
-            uint8_t castling_;
-        };
-
-        BoardState copyBoardState() const;
-        void consumeBoardState(BoardState& board_state);
 };
 
 } // namespace::dunsparce

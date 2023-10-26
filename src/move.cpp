@@ -26,7 +26,7 @@ Square Move::get_to_square() const {
 Piece Move::get_piece() const {
     return Piece((move & 0xf000) >> 12);
 }
-Piece Move::get_promoted_piece() const {
+Piece Move::get_promotion_piece() const {
     return Piece((move & 0xf0000) >> 16);
 }
 bool Move::get_capture_flag() const {
@@ -49,7 +49,7 @@ std::ostream& operator<<(std::ostream& out, const Move& move) {
               << "From: "           << squareToCoordinates(move.get_from_square())  << ", "
               << "To: "             << squareToCoordinates(move.get_to_square())    << ", "
               << "Piece: "          << pieceToUnicode(move.get_piece())             << ", "
-              << "Promoted piece: " << pieceToUnicode(move.get_promoted_piece())    << ", "
+              << "Promotion piece: " << pieceToUnicode(move.get_promotion_piece())    << ", "
               << "Capture: "        << (move.get_capture_flag() ? 'T' : 'F')        << ", "
               << "Double push: "    << (move.get_double_push_flag() ? 'T' : 'F')    << ", "
               << "Croissant: "      << (move.get_croissant_flag() ? 'T' : 'F')      << ", "

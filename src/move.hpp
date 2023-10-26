@@ -6,7 +6,7 @@
 
 namespace dunsparce::move {
 
-enum MoveType {
+enum class Type {
     Quiet,
     Capture,
     All
@@ -18,7 +18,7 @@ struct Move {
     Square get_from_square() const;
     Square get_to_square() const;
     Piece get_piece() const;
-    Piece get_promoted_piece() const;
+    Piece get_promotion_piece() const;
     bool get_capture_flag() const;
     bool get_double_push_flag() const;
     bool get_croissant_flag() const;

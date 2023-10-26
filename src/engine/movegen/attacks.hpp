@@ -16,28 +16,12 @@ inline std::vector<Bitboard> bishops_unblocked(NSquares);
 inline std::vector<Bitboard> rooks_unblocked(NSquares);
 inline std::vector<std::vector<Bitboard>> bishops(NSquares, std::vector<Bitboard>(512));
 inline std::vector<std::vector<Bitboard>> rooks(NSquares, std::vector<Bitboard>(4096));
-// Doesn't work (???)
-
-// inline Bitboard pawns[NColors-1][NSquares]; // pawns can only move in one direction
-// inline Bitboard knights[NSquares];
-// inline Bitboard kings[NSquares];
-
-// // sliders
-// inline Bitboard bishops_unblocked[NSquares];
-// inline Bitboard rooks_unblocked[NSquares];
-// inline Bitboard bishops[NSquares][512];
-// inline Bitboard rooks[NSquares][4096];
 
 Bitboard generatePawnAttacks(Color side, Square source);
-
 Bitboard generateKnightAttacks(Square source);
-
 Bitboard generateBishopAttacksNoBlockers(Square source);
-
 Bitboard generateBishopAttacksWithBlockers(Square source, const Bitboard& occupany_bb);
-
 Bitboard generateRookAttacksNoBlockers(Square source);
-
 Bitboard generateRookAttacksWithBlockers(Square source, const Bitboard& occupany_bb);
 
 Bitboard getPawnAttacks(Color side, Square source);
@@ -47,13 +31,13 @@ Bitboard getBishopAttacks(Square source, Bitboard occupancy_bb);
 Bitboard getRookAttacks(Square source, Bitboard occupancy_bb);
 Bitboard getQueenAttacks(Square source, const Bitboard& occupancy_bb);
 
-bool isAttacked(Square source, Color side, const Board& board);
-
 void initPawnAttacks();
 void initKnightAttacks();
 void initBishopAttacks();
 void initRookAttacks();
 void initKingAttacks();
 void initAllAttacks();
+
+bool isAttacked(Square source, Color side, const Board& board);
 
 } // namespace dunsparce::attacks

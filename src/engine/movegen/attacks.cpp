@@ -253,19 +253,14 @@ void initAllAttacks() {
 }
 
 bool isAttacked(Square source, Color side, const Board& board) {
+    if(source == NullSquare) return false;
     // cast ray from source square using every piece type
-    if((getPawnAttacks(utils::oppSide(side), source) & board.get_piece_bb(side, BasePawn))) return true;
-
+    if((getPawnAttacks(Color(side^1), source) & board.get_piece_bb(side, BasePawn))) return true;
     if(getKnightAttacks(source) & board.get_piece_bb(side, BaseKnight)) return true;
-
     if(getBishopAttacks(source, board.get_occupancy_bb(Both)) & board.get_piece_bb(side, BaseBishop)) return true;
-
     if(getRookAttacks(source, board.get_occupancy_bb(Both)) & board.get_piece_bb(side, BaseRook)) return true;
-    
     if(getKingAttacks(source) & board.get_piece_bb(side, BaseKing)) return true;
-
     if(getQueenAttacks(source, board.get_occupancy_bb(Both)) & board.get_piece_bb(side, BaseQueen)) return true;
-
     return false;
 }
 

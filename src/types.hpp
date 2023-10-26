@@ -48,6 +48,15 @@ enum Direction {
 };
 
 /**
+ * Type of color, including a type for no color
+*/
+enum Color {
+    Black = 0,
+    White = 1,
+    Both = 2,
+    NColors = 3
+};
+/**
  * Types for each piece
 */
 
@@ -76,15 +85,7 @@ enum Piece {
     NullPiece = 12,
     NPieces = 12,
 };
+inline Color get_color_of_piece(Piece piece) { return (piece <= 5 ? Black : White); }
 
-/**
- * Type of color, including a type for no color
-*/
-enum Color {
-    Black = 0,
-    White = 1,
-    Both = 2,
-    NColors = 3
-};
 
 } // namespace dunsparce

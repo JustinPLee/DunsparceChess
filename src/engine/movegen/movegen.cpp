@@ -12,6 +12,7 @@ namespace dunsparce::movegen {
 
 // store pawn pushes in lookup table (?)
 void populatePseudoLegalPawnMoves(Color side, Board& board) {
+    if(side == Both) { populatePseudoLegalPawnMoves(White, board); populatePseudoLegalPawnMoves(Black, board); return; }
     const int promotion_rank = (side == White ? 1 : 6);
     const int double_push_rank = (side == White ? 6 : 1);
     const int rel_move_offset = (side == White ? -8 : 8);
@@ -39,12 +40,12 @@ void populatePseudoLegalPawnMoves(Color side, Board& board) {
                 }
             }
         }
-        Bitboard attack_bb{ attacks::getPawnAttacks(side, from_square) & board.get_occupancy_bb(utils::oppSide(side)) };
+        Bitboard attack_bb{ attacks::getPawnAttacks(side, from_square) & board.get_occupancy_bb(Color(side^1)) };
         // exhaust every attack
         while(attack_bb) {
             const Square to_attack_square{ utils::findLSB(attack_bb) };
             // promotion capture
-            if(rank_of(to_attack_square) == promotion_rank) {
+            if(rank_of(from_square) == promotion_rank) {
                 board.addMove(from_square, to_attack_square, pawn, utils::createPiece(side, BaseQueen), true, false, false, false);
                 board.addMove(from_square, to_attack_square, pawn, utils::createPiece(side, BaseRook), true, false, false, false);
                 board.addMove(from_square, to_attack_square, pawn, utils::createPiece(side, BaseBishop), true, false, false, false);
@@ -67,6 +68,7 @@ void populatePseudoLegalPawnMoves(Color side, Board& board) {
 }
 
 void populatePseudoLegalKnightMoves(Color side, Board& board) {
+    if(side == Both) { populatePseudoLegalKnightMoves(White, board); populatePseudoLegalKnightMoves(Black, board); return; }
     const Piece knight{ utils::createPiece(side, BaseKnight) };
     Bitboard knight_bb{ board.get_piece_bb(knight) };
     while(knight_bb) {
@@ -74,7 +76,7 @@ void populatePseudoLegalKnightMoves(Color side, Board& board) {
         Bitboard attack_bb{ attacks::getKnightAttacks(from_square) & ~board.get_occupancy_bb(side) };
         while(attack_bb) {
             const Square to_square{ utils::findLSB(attack_bb) };
-            if(utils::isSquareEmpty(board.get_occupancy_bb(utils::oppSide(side)), to_square)) {
+            if(utils::isSquareEmpty(board.get_occupancy_bb(Color(side^1)), to_square)) {
                 // quiet
                 board.addMove(from_square, to_square, knight, NullPiece, false, false, false, false);
             } else {
@@ -88,6 +90,7 @@ void populatePseudoLegalKnightMoves(Color side, Board& board) {
 }
 
 void populatePseudoLegalBishopMoves(Color side, Board& board) {
+    if(side == Both) { populatePseudoLegalBishopMoves(White, board); populatePseudoLegalBishopMoves(Black, board); return; }
     const Piece bishop{ utils::createPiece(side, BaseBishop) };
     Bitboard bishop_bb{ board.get_piece_bb(bishop) };
     while(bishop_bb) {
@@ -95,7 +98,7 @@ void populatePseudoLegalBishopMoves(Color side, Board& board) {
         Bitboard attack_bb{ attacks::getBishopAttacks(from_square, board.get_occupancy_bb(Both)) & ~board.get_occupancy_bb(side) };
         while(attack_bb) {
             const Square to_square{ utils::findLSB(attack_bb) };
-            if(utils::isSquareEmpty(board.get_occupancy_bb(utils::oppSide(side)), to_square)) {
+            if(utils::isSquareEmpty(board.get_occupancy_bb(Color(side^1)), to_square)) {
                 // quiet
                 board.addMove(from_square, to_square, bishop, NullPiece, false, false, false, false);
             } else {
@@ -109,6 +112,7 @@ void populatePseudoLegalBishopMoves(Color side, Board& board) {
 }
 
 void populatePseudoLegalRookMoves(Color side, Board& board) {
+    if(side == Both) { populatePseudoLegalRookMoves(White, board); populatePseudoLegalRookMoves(Black, board); return; }
     const Piece rook{ utils::createPiece(side, BaseRook) };
     Bitboard rook_bb{ board.get_piece_bb(rook) };
     while(rook_bb) {
@@ -116,7 +120,7 @@ void populatePseudoLegalRookMoves(Color side, Board& board) {
         Bitboard attack_bb{ attacks::getRookAttacks(from_square, board.get_occupancy_bb(Both)) & ~board.get_occupancy_bb(side) };
         while(attack_bb) {
             const Square to_square{ utils::findLSB(attack_bb) };
-            if(utils::isSquareEmpty(board.get_occupancy_bb(utils::oppSide(side)), to_square)) {
+            if(utils::isSquareEmpty(board.get_occupancy_bb(Color(side^1)), to_square)) {
                 // quiet
                 board.addMove(from_square, to_square, rook, NullPiece, false, false, false, false);
             } else {
@@ -130,6 +134,7 @@ void populatePseudoLegalRookMoves(Color side, Board& board) {
 }
 
 void populatePseudoLegalQueenMoves(Color side, Board& board) {
+    if(side == Both) { populatePseudoLegalQueenMoves(White, board); populatePseudoLegalQueenMoves(Black, board); return; }
     const Piece queen{ utils::createPiece(side, BaseQueen) };
     Bitboard queen_bb{ board.get_piece_bb(queen) };
     while(queen_bb) {
@@ -137,7 +142,7 @@ void populatePseudoLegalQueenMoves(Color side, Board& board) {
         Bitboard attack_bb{ attacks::getQueenAttacks(from_square, board.get_occupancy_bb(Both)) & ~board.get_occupancy_bb(side) };
         while(attack_bb) {
             const Square to_square{ utils::findLSB(attack_bb) };
-            if(utils::isSquareEmpty(board.get_occupancy_bb(utils::oppSide(side)), to_square)) {
+            if(utils::isSquareEmpty(board.get_occupancy_bb(Color(side^1)), to_square)) {
                 // quiet
                 board.addMove(from_square, to_square, queen, NullPiece, false, false, false, false);
             } else {
@@ -151,6 +156,7 @@ void populatePseudoLegalQueenMoves(Color side, Board& board) {
 }
 
 void populatePseudoLegalKingMoves(Color side, Board& board) {
+    if(side == Both) { populatePseudoLegalKingMoves(White, board); populatePseudoLegalKingMoves(Black, board); return; }
     const Piece king{ utils::createPiece(side, BaseKing) };
     Bitboard king_bb{ board.get_piece_bb(king) };
     while(king_bb) {
@@ -158,7 +164,7 @@ void populatePseudoLegalKingMoves(Color side, Board& board) {
         Bitboard attack_bb{ attacks::getKingAttacks(from_square) & ~board.get_occupancy_bb(side) };
         while(attack_bb) {
             const Square to_square{ utils::findLSB(attack_bb) };
-            if(utils::isSquareEmpty(board.get_occupancy_bb(utils::oppSide(side)), to_square)) {
+            if(utils::isSquareEmpty(board.get_occupancy_bb(Color(side^1)), to_square)) {
                 // quiet
                 board.addMove(from_square, to_square, king, NullPiece, false, false, false, false);
             } else {
@@ -203,17 +209,13 @@ void populatePseudoLegalKingMoves(Color side, Board& board) {
 }
 
 void populateAllPseudoLegalMoves(Color side, Board& board) {
-    if(side == Both) {
-        populateAllPseudoLegalMoves(White, board);
-        populateAllPseudoLegalMoves(Black, board);
-    } else {
-        populatePseudoLegalPawnMoves(side, board);
-        populatePseudoLegalKnightMoves(side, board);
-        populatePseudoLegalBishopMoves(side, board);
-        populatePseudoLegalRookMoves(side, board);
-        populatePseudoLegalQueenMoves(side, board);
-        populatePseudoLegalKingMoves(side, board);
-    }
+    board.clearMoves();
+    populatePseudoLegalPawnMoves(side, board);
+    populatePseudoLegalKnightMoves(side, board);
+    populatePseudoLegalBishopMoves(side, board);
+    populatePseudoLegalRookMoves(side, board);
+    populatePseudoLegalQueenMoves(side, board);
+    populatePseudoLegalKingMoves(side, board);
 }
 
 } // namespace dunsparce::movegen

@@ -10,21 +10,17 @@
 #include "src/engine/movegen/magic.hpp"
 #include "src/engine/movegen/movegen.hpp"
 
+#include "src/perft.hpp"
+
+using namespace dunsparce;
 
 int main() {
-    using namespace dunsparce;
     attacks::initAllAttacks();
 
-    Board board{ constants::fens::starting };
-    movegen::populateAllPseudoLegalMoves(Both, board);
-    board.printMoves();
-    board.print();
+    Board board{ "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq –"};
 
-
-
-
-
-
+    perft::Perft pineapple{ board };
+    pineapple.profile(2);
 
     return 0;
 }

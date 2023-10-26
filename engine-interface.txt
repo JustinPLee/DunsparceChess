@@ -1,3 +1,5 @@
+valgrind --tool=callgrind ./(Your binary)
+./gprof2dot.py -f callgrind callgrind.out.x | dot -Tsvg -o output.svg
 
 
 Description of the universal chess interface (UCI)    April  2006

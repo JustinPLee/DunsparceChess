@@ -48,6 +48,11 @@
         "typeinfo": "cpp",
         "cinttypes": "cpp",
         "sstream": "cpp",
-        "charconv": "cpp"
+        "charconv": "cpp",
+        "chrono": "cpp",
+        "ctime": "cpp",
+        "ratio": "cpp",
+        "iomanip": "cpp",
+        "cstring": "cpp"
     }
 }

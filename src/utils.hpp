@@ -27,12 +27,12 @@ int popcount(Bitboard b);
 Square findLSB(const Bitboard& bb);
 
 void popSquare(Bitboard& bb, Square square);
+void setSquare(Bitboard& bb, Square square);
 
 void printBB(const Bitboard& bb);
 
-Color oppSide(Color color);
-
 bool isSquareEmpty(const Bitboard& bb, Square square);
+bool isSquareSet(const Bitboard& bb, Square square);
 
 Piece createPiece(Color color, BasePiece base_piece);
 

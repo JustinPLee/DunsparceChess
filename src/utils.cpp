@@ -102,6 +102,10 @@ void popSquare(Bitboard& bb, Square square) {
     bb &= ~(One << square);
 }
 
+void setSquare(Bitboard& bb, Square square) {
+    bb |= (One << square);
+}
+
 void printBB(const Bitboard& bb) {
     std::cout << '\n';
     for(int rank = 0; rank < 8; ++rank) {
@@ -117,20 +121,15 @@ void printBB(const Bitboard& bb) {
     std::cout << " Integer representation: " << bb << "\n\n";
 }
 
-Color oppSide(Color color) {
-    if(color == White) {
-        return Black;
-    } else {
-        return White;
-    }
-}
-
 Piece createPiece(Color color, BasePiece base_piece) {
-    return Piece(base_piece + 6 * static_cast<int>(color));
+    return Piece(base_piece + NPieces/2 * static_cast<int>(color));
 }
 
 bool isSquareEmpty(const Bitboard& bb, Square square) {
     return !(bb & (One << square));
+}
+bool isSquareSet(const Bitboard& bb, Square square) {
+    return (bb & (One << square));
 }
 
 } // namespace dunsparce::utils

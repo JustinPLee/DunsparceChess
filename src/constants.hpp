@@ -39,12 +39,26 @@ constexpr uint8_t castle_wq{ 0b0010 };
 constexpr uint8_t castle_bk{ 0b0100 };
 constexpr uint8_t castle_bq{ 0b1000 };
 
+// to minimize if branches
+// represents a 8 bit num
+constexpr std::array<int, 64> castling_rights{
+    7,  15, 15, 15, 3,  15, 15, 11,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    13, 15, 15, 15, 12, 15, 15, 14
+};
+
+
 }; // namespace dunsparce::constants
 
 namespace dunsparce::constants::fens {
 
 inline const std::string starting{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0" };
 inline const std::string empty{ "8/8/8/8/8/8/8/8 w - - " };
-inline const std::string test{ "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1 " };
+inline const std::string test{ "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -" };
 
 } // namespace dunsparce::constants::fens
