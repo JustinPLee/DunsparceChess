@@ -67,45 +67,6 @@ std::vector<std::string> tokenize(const std::string& str) {
     return tokens;
 }
 
-void printBits(Bitboard bb) {
-    if(bb == 0) {
-        std::cout << 0;
-        return;
-    }
-    std::string bit_s{};
-    for(int i = 0; i < 64; ++i) {
-        bit_s = std::to_string(bb & 1) + bit_s;
-        bb >>= 1;
-    }
-    std::cout << bit_s;
-}
-
-int popcount(Bitboard bb) {
-    int count = 0;
-    while(bb) {
-        ++count;
-        bb &= bb - 1;
-    }
-    return count;
-}
-
-// lsb (from topleft)
-Square findLSB(const Bitboard& bb) {
-    if (bb) {
-        return Square(popcount((bb & -bb) - 1));
-    } else {
-        return NullSquare;
-    }
-}
-
-void popSquare(Bitboard& bb, Square square) {
-    bb &= ~(One << square);
-}
-
-void setSquare(Bitboard& bb, Square square) {
-    bb |= (One << square);
-}
-
 void printBB(const Bitboard& bb) {
     std::cout << '\n';
     for(int rank = 0; rank < 8; ++rank) {
@@ -123,13 +84,6 @@ void printBB(const Bitboard& bb) {
 
 Piece createPiece(Color color, BasePiece base_piece) {
     return Piece(base_piece + NPieces/2 * static_cast<int>(color));
-}
-
-bool isSquareEmpty(const Bitboard& bb, Square square) {
-    return !(bb & (One << square));
-}
-bool isSquareSet(const Bitboard& bb, Square square) {
-    return (bb & (One << square));
 }
 
 } // namespace dunsparce::utils
