@@ -1,7 +1,3 @@
 all:
+	g++ -Og -std=c++20 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -fsanitize=undefined,address -Wfloat-equal -Wformat-nonliteral -Wformat-security -Wformat-y2k -Wformat=2 -Wimport -Winvalid-pch -Wlogical-op -Wmissing-field-initializers -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-noreturn -Wpacked -Wpointer-arith -Wredundant-decls -Wstack-protector -Wstrict-null-sentinel -Wundef -Wwrite-strings -Wdisabled-optimization -Wstrict-aliasing=2 -Wstrict-overflow=5 -Wunused -Wunused-parameter main.cpp src/board.cpp src/move.cpp src/uci.cpp src/engine/movegen.cpp && ./a.out
 
-debug:
-	g++ -Og -Wall --std=c++20 main.cpp src/board.cpp src/move.cpp src/uci.cpp src/utils.cpp src/engine/movegen/attacks.cpp src/engine/movegen/magic.cpp src/engine/movegen/movegen.cpp src/timer.cpp src/perft.cpp
-
-clang:
-	clang -Og -Wall --std=c++20 main.cpp src/board.cpp src/move.cpp src/uci.cpp src/utils.cpp src/engine/movegen/attacks.cpp src/engine/movegen/magic.cpp src/engine/movegen/movegen.cpp src/timer.cpp src/perft.cpp

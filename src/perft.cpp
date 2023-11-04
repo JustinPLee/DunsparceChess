@@ -1,18 +1,9 @@
-#include <iostream>
-#include <iomanip> // std::fixed
-
 #include "perft.hpp"
-#include "engine/movegen/movegen.hpp"
-#include "engine/movegen/attacks.hpp"
-#include "board.hpp"
-#include "timer.hpp"
-#include "move.hpp"
-#include "utils.hpp"
+
 namespace dunsparce::perft {
 
 Perft::Perft(const Board& board) {
     board_ = board;
-    attacks::initAllAttacks();
 }
 
 
@@ -47,5 +38,24 @@ void Perft::run(int depth) {
                   << " Nodes: " << (nodes_ - cum_nodes) << '\n';
     }
 }
+
+Perft::Timer::Timer(bool start_now) {
+    if(start_now) {
+        start();
+    }
+}
+
+void Perft::Timer::start() {
+    start_ = std::chrono::high_resolution_clock::now();
+}
+
+uint64_t Perft::Timer::get_elasped() const {
+    return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_).count();
+}
+
+void Perft::Timer::print() const {
+    std::cout << "Time: " << get_elasped() << "ms\n";
+}
+
 
 } // namespace dunsparce::perft

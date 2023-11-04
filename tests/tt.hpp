@@ -3,7 +3,23 @@
 #include <functional>
 #include <string>
 
-namespace my_testing_thing {
+
+/**
+    void testX() {
+        int x{};
+        test::test("X equals 0", [&]() {
+            test::pray(x == 0);
+        });
+    }
+    std::vector allTests {
+        testPseudoLegalMoveGeneration,
+        testSanity
+    };
+
+    test::executeAll(allTests);
+*/
+
+namespace tt {
 
 int pray_index = 0;
 struct TestCase {
@@ -23,12 +39,13 @@ void pray(bool cond) {
 }
 
 
-template <typename F>
-void test(const std::string& description, F&& func) {
+template <typename Func>
+void test(const std::string& description, Func&& func) {
     testCases.emplace_back(description, func);
 }
 
-void executeAll(std::vector<std::function<void()>>& allTests) {
+template <typename Func>
+void executeAll(Func&& allTests) {
     std::cout << "Starting tests...\n\n";
     int total_tests = 0;
     int errors = 0;
@@ -65,4 +82,4 @@ void executeAll(std::vector<std::function<void()>>& allTests) {
     }
 }
 
-} // namespace my_testing_thing
+}

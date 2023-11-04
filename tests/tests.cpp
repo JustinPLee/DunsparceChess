@@ -1,26 +1,11 @@
-/**
- * This file could become very long very quickly.
-*/
-#include <iostream>
-#include <vector>
-#include <functional>
-#include <string>
-
-#include "my_testing_thing.hpp"
+#include "tt.hpp"
 
 #include "../src/types.hpp"
 #include "../src/board.hpp"
-#include "../src/constants.hpp"
 #include "../src/move.hpp"
-#include "../src/utils.hpp"
+#include "../src/globals.hpp"
 #include "../src/uci.hpp"
 #include "../src/engine/movegen/movegen.hpp"
-#include "../src/engine/movegen/magic.hpp"
-#include "../src/engine/movegen/attacks.hpp"
-
-using namespace my_testing_thing;
-
-namespace dunsparce::tests {
 
 /*****************
  * 
@@ -30,16 +15,17 @@ namespace dunsparce::tests {
  * 
  ****************/
 
+using namespace tt;
+
 
 void testPseudoLegalMoveGeneration() {
     std::cout << "Pseudolegal Move Generation\n";
     std::cout << "===========================\n";
 
     test("Starting Fen", [&]() {
-        Board board{};
-        board.parseFen(constants::fens::starting);
-        movegen::generatePseudoLegalPawnMoves(White, board);
-        movegen::generatePseudoLegalPawnMoves(Black, board);
+        Board board;
+        board.parseFen(globals::sample_fens::starting);
+        generatePseudoLegalPawnMoves(board.state);
         pray(board.getMoves().size() == 32);
     });
 
@@ -62,13 +48,11 @@ void initAll() {
 }
 
 int main() {
-    using namespace dunsparce;
-
     initAll();
 
     std::vector<std::function<void()>> allTests {
-        tests::testPseudoLegalMoveGeneration,
-        tests::testSanity
+        testPseudoLegalMoveGeneration,
+        testSanity
     };
 
     executeAll(allTests);
